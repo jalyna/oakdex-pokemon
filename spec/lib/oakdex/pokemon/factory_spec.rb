@@ -9,6 +9,7 @@ describe Oakdex::Pokemon do
         wild: true,
         original_trainer: 'Name of Trainer',
         item_id: 'Name of Item',
+        primary_status_condition: 'fire',
         amie: {
           affection: 1,
           fullness: 2,
@@ -96,6 +97,7 @@ describe Oakdex::Pokemon do
         wild: true,
         original_trainer: 'Name of Trainer',
         item_id: 'Name of Item',
+        primary_status_condition: 'fire',
         amie: {
           affection: 1,
           fullness: 2,

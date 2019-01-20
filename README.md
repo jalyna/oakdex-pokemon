@@ -41,7 +41,8 @@ bulbasaur = Oakdex::Pokemon.create('Bulbasaur', { # many options available
   ],
   original_trainer: 'Cool trainer name',
   item_id: 'Lucky Egg',
-  wild: true
+  wild: true,
+  primary_status_condition: 'sleep'
 })
 
 pikachu.gender # => female

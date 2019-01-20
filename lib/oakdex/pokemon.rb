@@ -27,6 +27,14 @@ module Oakdex
       @attributes = attributes
     end
 
+    def primary_status_condition
+      @attributes[:primary_status_condition]
+    end
+
+    def primary_status_condition=(value)
+      @attributes[:primary_status_condition] = value
+    end
+
     def name
       @species.names['en']
     end
@@ -41,6 +49,10 @@ module Oakdex
 
     def current_hp
       @attributes[:hp]
+    end
+
+    def fainted?
+      current_hp.zero?
     end
 
     def moves_with_pp

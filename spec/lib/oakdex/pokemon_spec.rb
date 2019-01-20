@@ -80,6 +80,14 @@ describe Oakdex::Pokemon do
     it { expect(subject.current_hp).to eq(12) }
   end
 
+  describe '#fainted?' do
+    it { expect(subject).not_to be_fainted }
+    context 'no hp left' do
+      let(:additional_attributes) { { hp: 0 } }
+      it { expect(subject).to be_fainted }
+    end
+  end
+
   describe '#level' do
     it { expect(subject.level).to eq(4) }
   end
@@ -258,5 +266,12 @@ describe Oakdex::Pokemon do
       } } }
       it { expect(subject.amie_level(:affection)).to eq(4) }
     end
+  end
+
+  describe '#primary_status_condition' do
+    before do
+      subject.primary_status_condition = 'sleep'
+    end
+    it { expect(subject.primary_status_condition).to eq('sleep') }
   end
 end

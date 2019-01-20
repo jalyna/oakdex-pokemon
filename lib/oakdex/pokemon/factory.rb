@@ -5,6 +5,7 @@ module Oakdex
       REQUIRED_ATTRIBUTES = %i[exp gender ability nature hp iv ev moves]
       OPTIONAL_ATTRIBUTES = %i[
         original_trainer
+        primary_status_condition
         wild
         item_id
         amie
@@ -27,6 +28,10 @@ module Oakdex
       end
 
       private
+
+      def primary_status_condition
+        @options[:primary_status_condition]
+      end
 
       def original_trainer
         @options[:original_trainer]
