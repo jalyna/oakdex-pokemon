@@ -4,9 +4,59 @@
 
 Based on [oakdex-pokedex](https://github.com/jalyna/oakdex-pokedex).
 
+Used as a representation for Pokémon across other Projects like [oakdex-battle](https://github.com/jalyna/oakdex-battle) and [oakdex-breeding](https://github.com/jalyna/oakdex-breeding).
+
 ## Getting Started
 
-TBD
+```ruby
+require 'oakdex/pokemon'
+
+pikachu = Oakdex::Pokemon.create('Pikachu', level: 12)
+bulbasaur = Oakdex::Pokemon.create('Bulbasaur', { # many options available
+  exp: 120,
+  gender: 'female',
+  ability: 'Soundproof',
+  nature: 'Bashful',
+  item: 'Earth Plate',
+  hp: 2,
+  iv: {
+    hp: 8,
+    atk: 12,
+    def: 31,
+    sp_atk: 12,
+    sp_def: 5,
+    speed: 14
+  },
+  ev: {
+    hp: 8,
+    atk: 12,
+    def: 99,
+    sp_atk: 4,
+    sp_def: 12,
+    speed: 14
+  },
+  moves: [
+    ['Swords Dance', 12, 30],
+    ['Cut', 40, 44]
+  ],
+  original_trainer: 'Cool trainer name',
+  item_id: 'Lucky Egg',
+  wild: true
+})
+
+pikachu.gender # => female
+pikachu.name # => Pikachu
+pikachu.level # => 12
+pikachu.moves.map { |p| "#{p.name} #{p.pp}" } # => ["Quick Attack 30", "Tail Whip 30", "Growl 40", "Thunder Shock 30"]
+pikachu.hp # => 34
+pikachu.atk # => 18
+pikachu.current_hp # => 34
+pikachu.traded? # => false
+pikachu.change_hp_by(38)
+pikachu.current_hp # => 0
+pikachu.change_pp_by('Thunder Shock', -1)
+pikachu.moves.map { |p| "#{p.name} #{p.pp}" } # => ["Quick Attack 30", "Tail Whip 30", "Growl 40", "Thunder Shock 29"]
+```
 
 ## Contributing
 
