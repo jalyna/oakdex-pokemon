@@ -55,8 +55,17 @@ module Oakdex
       end
 
       def move_learned_match?(e)
-        !e['move_learned'] || @pokemon.moves.map(&:name)
-          .include?(e['move_learned'])
+        !e['move_learned'] || currently_learned_move?(e) ||
+          pokemon_learned_move_already?(e)
+      end
+
+      def currently_learned_move?(e)
+        e['move_learned'] && e['move_learned'] == @options[:move_id]
+      end
+
+      def pokemon_learned_move_already?(e)
+        @trigger != 'move_learned' &&
+          @pokemon.moves.map(&:name).include?(e['move_learned'])
       end
 
       def conditions_match?(e)

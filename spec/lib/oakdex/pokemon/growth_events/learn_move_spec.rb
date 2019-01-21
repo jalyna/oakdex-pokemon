@@ -36,10 +36,31 @@ describe Oakdex::Pokemon::GrowthEvents::LearnMove do
   end
 
   describe '#execute' do
+    let(:evolution) { nil }
+    let(:evolution_matcher) { double(:evolution_matcher, evolution: evolution) }
+
+    before do
+      allow(Oakdex::Pokemon::EvolutionMatcher).to receive(:new)
+        .with(pokemon, 'move_learned', move_id: 'Tackle').and_return(evolution_matcher)
+    end
+
     it 'pokemon learns new move' do
       expect(pokemon).to receive(:learn_new_move).with('Tackle')
       expect(pokemon).to receive(:remove_growth_event)
       subject.execute
+    end
+
+    context 'evolution available' do
+      let(:evolution) { 'SuperBeauty' }
+
+      it 'triggers evolution event' do
+        expect(pokemon).to receive(:learn_new_move).with('Tackle')
+        expect(pokemon).to receive(:add_growth_event)
+          .with(Oakdex::Pokemon::GrowthEvents::Evolution,
+            evolution: 'SuperBeauty', after: subject)
+        expect(pokemon).to receive(:remove_growth_event)
+        subject.execute
+      end
     end
 
     context 'no slot left' do
