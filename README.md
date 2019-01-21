@@ -59,6 +59,20 @@ pikachu.change_pp_by('Thunder Shock', -1)
 pikachu.moves.map { |p| "#{p.name} #{p.pp}" } # => ["Quick Attack 30", "Tail Whip 30", "Growl 40", "Thunder Shock 29"]
 ```
 
+
+### Exp Gain Calculation
+
+```ruby
+fainted = Oakdex::Pokemon.create('Pikachu', level: 10)
+winner = Oakdex::Pokemon.create('Bulbasaur', level: 12)
+
+Oakdex::Pokemon::ExperienceGainCalculator.calculate(fainted, winner) # => 269
+Oakdex::Pokemon::ExperienceGainCalculator.calculate(fainted, winner, flat: true) # => 225
+Oakdex::Pokemon::ExperienceGainCalculator.calculate(fainted, winner, winner_using_exp_share: true) # => 135
+```
+
+
+
 ## Contributing
 
 I would be happy if you want to add your contribution to the project. In order to contribute, you just have to fork this repository.
