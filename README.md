@@ -80,7 +80,7 @@ pikachu.exp # => 2197
 
 # Calculate exp from won battles
 fainted_opponent = bulbasaur
-pikachu.add_exp_from_battle(fainted_opponent, using_exp_share: false, flat: false)
+pikachu.gain_exp_from_battle(fainted_opponent, using_exp_share: false, flat: false)
 ```
 
 

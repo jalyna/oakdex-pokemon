@@ -157,6 +157,11 @@ module Oakdex
       gain_exp(gained_exp)
     end
 
+    def gain_exp_from_battle(fainted, options = {})
+      exp = ExperienceGainCalculator.calculate(fainted, self, options)
+      gain_exp(exp)
+    end
+
     def growth_event?
       !@attributes[:growth_events].empty?
     end

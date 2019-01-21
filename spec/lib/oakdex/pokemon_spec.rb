@@ -326,6 +326,17 @@ describe Oakdex::Pokemon do
     end
   end
 
+  describe '#gain_exp_from_battle' do
+    let(:fainted) { double(:fainted) }
+    it 'calls gain_exp' do
+      expect(Oakdex::Pokemon::ExperienceGainCalculator).to receive(:calculate)
+        .with(fainted, subject, flat: true)
+        .and_return(25)
+      expect(subject).to receive(:gain_exp).with(25)
+      subject.gain_exp_from_battle(fainted, flat: true)
+    end
+  end
+
   describe '#add_growth_event' do
     let(:growth_event) { double(:growth_event) }
     let(:growth_event2) { double(:growth_event) }
