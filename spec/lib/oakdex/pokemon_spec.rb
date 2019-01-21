@@ -324,6 +324,33 @@ describe Oakdex::Pokemon do
     end
   end
 
+  describe '#trade_to' do
+    let(:trainer) { double(:trainer) }
+    let(:evolution) { nil }
+    let(:evolution_matcher) { double(:evolution_matcher, evolution: evolution) }
+
+    before do
+      allow(Oakdex::Pokemon::EvolutionMatcher).to receive(:new)
+        .with(subject, 'trade').and_return(evolution_matcher)
+    end
+
+    it 'changes trainer' do
+      subject.trade_to(trainer)
+      expect(subject.trainer).to eq(trainer)
+    end
+
+    context 'trade evolution' do
+      let(:evolution) { 'NewPokemon' }
+
+      it 'creates growth event' do
+        expect(subject).to receive(:add_growth_event)
+          .with(Oakdex::Pokemon::GrowthEvents::Evolution, evolution: 'NewPokemon')
+        subject.trade_to(trainer)
+        expect(subject.trainer).to eq(trainer)
+      end
+    end
+  end
+
   describe '#increment_level' do
     it 'calls gain_exp' do
       expect(subject).to receive(:gain_exp).with(25)

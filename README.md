@@ -81,7 +81,7 @@ pikachu.exp # => 2197
 fainted_opponent = bulbasaur
 pikachu.gain_exp_from_battle(fainted_opponent, using_exp_share: false, flat: false)
 
-# Evolution
+# Evolution by level
 charmander = Oakdex::Pokemon.create('Charmander', level: 15)
 charmander.increment_level
 # Charmander envolves to Charmeleon
@@ -98,6 +98,25 @@ while charmander.growth_event? do
 end
 charmander.level # => 16
 charmander.name # => Charmeleon
+
+# Evolution by trade
+feebas = Oakdex::Pokemon.create('Feebas', level: 12, item_id: 'Prism Scale')
+trainer = OpenStruct.new(name: 'My Awesome Trainer')
+feebas.trade_to(trainer)
+# Feebas envolves to Milotic
+while feebas.growth_event? do
+  e = feebas.growth_event
+  if e.read_only?
+    puts e.message
+    e.execute
+  else
+    puts e.message
+    puts e.possible_actions # => ['Continue', 'Skip']
+    e.execute(e.possible_actions.first)
+  end
+end
+feebas.name # => Milotic
+feebas.trainer # => trainer
 ```
 
 
