@@ -4,6 +4,7 @@ require 'oakdex/pokedex'
 require 'oakdex/pokemon/stat'
 require 'oakdex/pokemon/move'
 require 'oakdex/pokemon/factory'
+require 'oakdex/pokemon/experience_gain_calculator'
 
 module Oakdex
   # Represents detailed pokemon instance
