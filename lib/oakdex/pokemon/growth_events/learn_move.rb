@@ -20,6 +20,11 @@ class Oakdex::Pokemon
       def execute(action = nil)
         if move_slot_left?
           @pokemon.learn_new_move(@options[:move_id])
+          if available_evolution
+            @pokemon.add_growth_event(GrowthEvents::Evolution,
+                                      evolution: available_evolution,
+                                      after: self)
+          end
         else
           if action == not_learn_action
             @pokemon.add_growth_event(GrowthEvents::DidNotLearnMove,
@@ -37,6 +42,11 @@ class Oakdex::Pokemon
       end
 
       private
+
+      def available_evolution
+        @available_evolution ||= Oakdex::Pokemon::EvolutionMatcher
+          .new(@pokemon, 'move_learned', move_id: @options[:move_id]).evolution
+      end
 
       def not_learn_action
         "Do not learn #{@options[:move_id]}"

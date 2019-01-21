@@ -9,4 +9,31 @@ describe Oakdex::Pokemon::GrowthEvents::ForgotAndLearnedMove do
     it { expect(subject.message)
       .to eq('Beauty learned Tackle and forgot Thunder Shock.') }
   end
+
+  describe '#execute' do
+    let(:evolution) { nil }
+    let(:evolution_matcher) { double(:evolution_matcher, evolution: evolution) }
+
+    before do
+      allow(Oakdex::Pokemon::EvolutionMatcher).to receive(:new)
+        .with(pokemon, 'move_learned', move_id: 'Tackle').and_return(evolution_matcher)
+    end
+
+    it 'removes growth event' do
+      expect(pokemon).to receive(:remove_growth_event)
+      subject.execute
+    end
+
+    context 'evolution available' do
+      let(:evolution) { 'SuperBeauty' }
+
+      it 'triggers evolution event' do
+        expect(pokemon).to receive(:add_growth_event)
+          .with(Oakdex::Pokemon::GrowthEvents::Evolution,
+            evolution: 'SuperBeauty', after: subject)
+        expect(pokemon).to receive(:remove_growth_event)
+        subject.execute
+      end
+    end
+  end
 end

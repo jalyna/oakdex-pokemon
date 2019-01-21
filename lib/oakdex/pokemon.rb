@@ -157,6 +157,24 @@ module Oakdex
       add_growth_event(GrowthEvents::GainedExp, gained_exp: gained_exp)
     end
 
+    def trade_to(trainer)
+      self.trainer = trainer
+      available_evolution = EvolutionMatcher.new(self, 'trade').evolution
+
+      add_growth_event(GrowthEvents::Evolution,
+                       evolution: available_evolution) if available_evolution
+    end
+
+    def usable_item?(item_id)
+      !evolution_by_item(item_id).nil?
+    end
+
+    def use_item(item_id)
+      return unless usable_item?(item_id)
+      add_growth_event(GrowthEvents::Evolution,
+                       evolution: evolution_by_item(item_id))
+    end
+
     def increment_level
       gained_exp = exp_next_level - @attributes[:exp]
       gain_exp(gained_exp)
@@ -204,6 +222,10 @@ module Oakdex
     end
 
     private
+
+    def evolution_by_item(item_id)
+      EvolutionMatcher.new(self, 'item', item_id: item_id).evolution
+    end
 
     def initial_stat(stat)
       Stat.initial_stat(stat,

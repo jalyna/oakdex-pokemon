@@ -164,6 +164,7 @@ describe Oakdex::Pokemon::EvolutionMatcher do
         it { expect(subject.evolution).to be_nil }
 
         context 'pokemon has tackle' do
+          let(:options) { { move_id: 'Tackle' } }
           let(:moves) { [double(:move, name: 'Tackle')] }
           it { expect(subject.evolution).to eq('Destination') }
         end
