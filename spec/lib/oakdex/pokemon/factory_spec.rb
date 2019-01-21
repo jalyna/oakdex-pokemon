@@ -20,14 +20,15 @@ describe Oakdex::Pokemon do
     let(:exp) { 50 }
     let(:hp) { double(:hp) }
     let(:pokemon) { double(:pokemon) }
-    let(:ability) { double(:ability) }
-    let(:nature) { double(:nature) }
-    let(:gender) { 'female' }
     let(:ability_name) { 'Soundproof' }
+    let(:ability) { double(:ability, names: { 'en' => ability_name }) }
+    let(:nature) { double(:nature, names: { 'en' => 'Careful' }) }
+    let(:gender) { 'female' }
     let(:move_type) { double(:move_type, pp: 44) }
     let(:move) { double(:move) }
     let(:species) do
       double(:species,
+             names: { 'en' => 'My Species' },
              leveling_rate: 'leveling_rate',
              gender_ratios: {
                'male' => 25.5,
@@ -88,8 +89,8 @@ describe Oakdex::Pokemon do
       {
         exp: exp,
         gender: gender,
-        ability: ability,
-        nature: nature,
+        ability_id: ability_name,
+        nature_id: 'Careful',
         hp: hp,
         iv: iv,
         ev: ev,
@@ -109,8 +110,6 @@ describe Oakdex::Pokemon do
     before do
       allow(Oakdex::Pokedex::Pokemon).to receive(:find!)
         .with(species_name).and_return(species)
-      allow(Oakdex::Pokedex::Ability).to receive(:find!)
-        .with(ability_name).and_return(ability)
       allow(Oakdex::Pokedex::Move).to receive(:find!)
         .with('Move1').and_return(move_type)
       allow(Oakdex::Pokemon::Move).to receive(:new)
@@ -118,7 +117,9 @@ describe Oakdex::Pokemon do
       allow(Oakdex::Pokemon::Stat).to receive(:exp_by_level)
         .with(species.leveling_rate, options[:level]).and_return(exp)
       allow(Oakdex::Pokedex::Nature).to receive(:all)
-        .and_return('Nature' => nature)
+        .and_return('Careful' => nature)
+      allow(Oakdex::Pokedex::Nature).to receive(:find!).with('Careful')
+        .and_return(nature)
       allow_any_instance_of(Oakdex::Pokemon::Factory)
         .to receive(:rand).with(1..1000).and_return(500)
       allow_any_instance_of(Oakdex::Pokemon::Factory)
@@ -138,7 +139,7 @@ describe Oakdex::Pokemon do
 
     it 'creates pokemon with auto-generated attributes' do
       expect(described_class).to receive(:new).with(
-        species,
+        'My Species',
         attributes
       ).and_return(pokemon)
       expect(described_class.create(species_name, options)).to eq(pokemon)
@@ -194,7 +195,7 @@ describe Oakdex::Pokemon do
 
       it 'creates pokemon with auto-generated attributes plus additional moves' do
         expect(described_class).to receive(:new).with(
-          species,
+          'My Species',
           new_attributes
         ).and_return(pokemon)
         expect(described_class.create(species_name, new_options)).to eq(pokemon)
@@ -230,7 +231,7 @@ describe Oakdex::Pokemon do
           exp: exp,
           gender: 'male',
           ability: 'Something',
-          nature: 'MyNature',
+          nature: 'Careful',
           hp: hp,
           iv: iv,
           ev: ev,
@@ -249,7 +250,7 @@ describe Oakdex::Pokemon do
 
       it 'creates pokemon by given attributes' do
         expect(described_class).to receive(:new).with(
-          species,
+          'My Species',
           attributes
         ).and_return(pokemon)
         expect(described_class.create(species_name, new_options)).to eq(pokemon)
