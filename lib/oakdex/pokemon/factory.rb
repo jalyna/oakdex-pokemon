@@ -2,7 +2,7 @@ module Oakdex
   class Pokemon
     # Creates Pokemon instance and prefills attributes
     class Factory
-      REQUIRED_ATTRIBUTES = %i[exp gender ability nature hp iv ev moves]
+      REQUIRED_ATTRIBUTES = %i[exp gender ability_id nature_id hp iv ev moves]
       OPTIONAL_ATTRIBUTES = %i[
         original_trainer
         primary_status_condition
@@ -18,7 +18,7 @@ module Oakdex
             OPTIONAL_ATTRIBUTES).map do |attr|
                               [attr, factory.send(attr)]
                             end]
-          Pokemon.new(species, attributes)
+          Pokemon.new(species.names['en'], attributes)
         end
       end
 
@@ -84,11 +84,11 @@ module Oakdex
         end.compact
       end
 
-      def ability
-        if @options['ability']
-          Oakdex::Pokedex::Ability.find!(@options['ability'])
+      def ability_id
+        if @options[:ability_id]
+          @options[:ability_id]
         else
-          Oakdex::Pokedex::Ability.find!(abilities.sample['name'])
+          abilities.sample['name']
         end
       end
 
@@ -146,12 +146,16 @@ module Oakdex
         end
       end
 
-      def nature(options = {})
-        @nature ||= if options[:nature]
-                      Oakdex::Pokedex::Nature.find!(options[:nature])
-                    else
-                      Oakdex::Pokedex::Nature.all.values.sample
-                    end
+      def nature_id
+        @nature_id ||= if @options[:nature_id]
+                         @options[:nature_id]
+                       else
+                         Oakdex::Pokedex::Nature.all.values.sample.names['en']
+                       end
+      end
+
+      def nature
+        @nature ||= Oakdex::Pokedex::Nature.find!(nature_id)
       end
     end
   end

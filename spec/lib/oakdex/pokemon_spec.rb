@@ -32,15 +32,15 @@ describe Oakdex::Pokemon do
     {
       exp: 100,
       gender: 'female',
-      ability: Oakdex::Pokedex::Ability.find('Static'),
-      nature: Oakdex::Pokedex::Nature.find('Bashful'),
+      ability_id: 'Static',
+      nature_id: 'Bashful',
       hp: 12,
       iv: iv,
       ev: ev,
       moves: [move]
     }.merge(additional_attributes)
   end
-  subject { described_class.new(species, attributes) }
+  subject { described_class.new(species.names['en'], attributes) }
 
   describe '.create' do
     let(:species_name) { 'Bulbasaur' }
@@ -57,6 +57,13 @@ describe Oakdex::Pokemon do
 
     it 'creates pokemon with auto-generated attributes' do
       expect(described_class.create(species_name, options)).to eq(pokemon)
+    end
+  end
+
+  describe '#inspect' do
+    it 'does not include pokedex data' do
+      expect(subject.inspect).not_to include('"catch_rate"=>')
+      expect(subject.inspect).not_to include('"accuracy"=>')
     end
   end
 
@@ -90,6 +97,10 @@ describe Oakdex::Pokemon do
 
   describe '#level' do
     it { expect(subject.level).to eq(4) }
+  end
+
+  describe '#exp' do
+    it { expect(subject.exp).to eq(100) }
   end
 
   describe '#hp' do

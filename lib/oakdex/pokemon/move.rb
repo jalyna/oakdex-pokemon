@@ -24,6 +24,17 @@ module Oakdex
         @max_pp     = max_pp
       end
 
+      def inspect
+        fields = instance_variables.map do |name|
+          if name == :@move_type
+            "#{name}=#<Oakdex::Pokedex::Move #{@move_type.name}>"
+          else
+            "#{name}=#{instance_variable_get(name)}"
+          end
+        end
+        "#<#{self.class.name}:#{object_id} #{fields.join(', ')}>"
+      end
+
       def name
         @move_type.names['en']
       end

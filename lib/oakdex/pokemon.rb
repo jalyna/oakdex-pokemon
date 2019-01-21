@@ -13,19 +13,26 @@ module Oakdex
 
     BATTLE_STATS = %i[hp atk def sp_atk sp_def speed]
 
-    def_delegators :@species, :types
+    def_delegators :species, :types
 
     attr_accessor :trainer
-    attr_reader :species
 
     def self.create(species_name, options = {})
       species = Oakdex::Pokedex::Pokemon.find!(species_name)
       Factory.create(species, options)
     end
 
-    def initialize(species, attributes = {})
-      @species = species
+    def initialize(species_id, attributes = {})
+      @species_id = species_id
       @attributes = attributes
+    end
+
+    def species
+      @species ||= Oakdex::Pokedex::Pokemon.find!(@species_id)
+    end
+
+    def inspect
+      "#<#{self.class.name}:#{object_id} #{@attributes.inspect}>"
     end
 
     def primary_status_condition
@@ -37,7 +44,7 @@ module Oakdex
     end
 
     def name
-      @species.names['en']
+      species.names['en']
     end
 
     def gender
@@ -110,8 +117,12 @@ module Oakdex
                 end
     end
 
+    def exp
+      @attributes[:exp]
+    end
+
     def level
-      Stat.level_by_exp(@species.leveling_rate, @attributes[:exp])
+      Stat.level_by_exp(species.leveling_rate, @attributes[:exp])
     end
 
     BATTLE_STATS.each do |stat|
@@ -125,11 +136,15 @@ module Oakdex
     def initial_stat(stat)
       Stat.initial_stat(stat,
                         level:      level,
-                        nature:     @attributes[:nature],
+                        nature:     nature,
                         iv:         @attributes[:iv],
                         ev:         @attributes[:ev],
-                        base_stats: @species.base_stats
+                        base_stats: species.base_stats
                        )
+    end
+
+    def nature
+      @nature ||= Oakdex::Pokedex::Nature.find!(@attributes[:nature_id])
     end
   end
 end
