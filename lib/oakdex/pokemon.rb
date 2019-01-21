@@ -195,6 +195,14 @@ module Oakdex
       evt
     end
 
+    def envolve_to(species_id)
+      old_max_hp = hp
+      @species = nil
+      @species_id = species_id
+      change_hp_by(hp - old_max_hp) unless fainted?
+      species
+    end
+
     private
 
     def initial_stat(stat)

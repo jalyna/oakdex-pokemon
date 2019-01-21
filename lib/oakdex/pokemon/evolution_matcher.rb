@@ -3,6 +3,8 @@ module Oakdex
     # Calculates if Pokemon can envolve and to which
     # item, move_learned, trade, level_up are possible triggers
     class EvolutionMatcher
+      TRIGGERS = %w[item trade level level_up move_learned happiness]
+
       def initialize(pokemon, trigger, options = {})
         @pokemon = pokemon
         @trigger = trigger
@@ -17,9 +19,7 @@ module Oakdex
 
       def evolutions
         available_evolutions.map do |e|
-          if trigger_for(e) == @trigger && valid_evolution?(e)
-            e['to']
-          end
+          e['to'] if trigger_for(e) == @trigger && valid_evolution?(e)
         end.compact
       end
 
@@ -28,7 +28,7 @@ module Oakdex
       end
 
       def trigger_for(evolution)
-        original_trigger = %w[item trade level level_up move_learned happiness].find do |t|
+        original_trigger = TRIGGERS.find do |t|
           evolution[t]
         end
         return 'level_up' if %w[level happiness].include?(original_trigger)
@@ -57,7 +57,8 @@ module Oakdex
       end
 
       def move_learned_match?(e)
-        !e['move_learned'] || @pokemon.moves.map(&:name).include?(e['move_learned'])
+        !e['move_learned'] || @pokemon.moves.map(&:name)
+          .include?(e['move_learned'])
       end
 
       def conditions_match?(e)

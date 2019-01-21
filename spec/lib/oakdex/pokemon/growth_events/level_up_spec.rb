@@ -16,6 +16,13 @@ describe Oakdex::Pokemon::GrowthEvents::LevelUp do
   end
 
   describe '#execute' do
+    let(:evolution) { nil }
+    let(:evolution_matcher) { double(:evolution_matcher, evolution: evolution) }
+    before do
+      allow(Oakdex::Pokemon::EvolutionMatcher).to receive(:new)
+        .with(pokemon, 'level_up').and_return(evolution_matcher)
+    end
+
     it 'removes last event' do
       expect(pokemon).to receive(:remove_growth_event)
       subject.execute
@@ -48,6 +55,18 @@ describe Oakdex::Pokemon::GrowthEvents::LevelUp do
           .with(Oakdex::Pokemon::GrowthEvents::LearnMove,
             move_id: 'NewMove2', after: growth_event1)
           .and_return(growth_event2)
+        expect(pokemon).to receive(:remove_growth_event)
+        subject.execute
+      end
+    end
+
+    context 'evolution available' do
+      let(:evolution) { 'SuperBeauty' }
+
+      it 'triggers evolution event' do
+        expect(pokemon).to receive(:add_growth_event)
+          .with(Oakdex::Pokemon::GrowthEvents::Evolution,
+            evolution: 'SuperBeauty', after: subject)
         expect(pokemon).to receive(:remove_growth_event)
         subject.execute
       end

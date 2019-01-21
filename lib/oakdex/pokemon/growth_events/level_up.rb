@@ -15,6 +15,11 @@ class Oakdex::Pokemon
                                                move_id: move_id,
                                                after: last_evt)
         end
+        if available_evolution
+          @pokemon.add_growth_event(GrowthEvents::Evolution,
+                                    evolution: available_evolution,
+                                    after: last_evt)
+        end
         remove_event
       end
 
@@ -24,6 +29,11 @@ class Oakdex::Pokemon
         @pokemon.species.learnset.map do |m|
           m['move'] if m['level'] && m['level'] == @options[:new_level]
         end.compact
+      end
+
+      def available_evolution
+        @available_evolution ||= Oakdex::Pokemon::EvolutionMatcher
+          .new(@pokemon, 'level_up').evolution
       end
     end
   end

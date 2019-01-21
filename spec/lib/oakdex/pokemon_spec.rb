@@ -342,6 +342,18 @@ describe Oakdex::Pokemon do
     end
   end
 
+  describe '#envolve_to' do
+    let(:new_pokemon) { double(:new_pokemon) }
+    it 'changes species and hp' do
+      allow(Oakdex::Pokedex::Pokemon).to receive(:find!)
+        .with('NewPokemon').and_return(new_pokemon)
+      allow(subject).to receive(:hp).and_return(10, 12)
+      expect(subject).to receive(:change_hp_by).with(2)
+      subject.envolve_to('NewPokemon')
+      expect(subject.species).to eq(new_pokemon)
+    end
+  end
+
   describe '#add_growth_event' do
     let(:growth_event) { double(:growth_event) }
     let(:growth_event2) { double(:growth_event) }
