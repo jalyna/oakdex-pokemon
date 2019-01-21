@@ -351,6 +351,45 @@ describe Oakdex::Pokemon do
     end
   end
 
+  describe '#usable_item?' do
+    let(:evolution) { nil }
+    let(:evolution_matcher) { double(:evolution_matcher, evolution: evolution) }
+
+    before do
+      allow(Oakdex::Pokemon::EvolutionMatcher).to receive(:new)
+        .with(subject, 'item', item_id: 'Leaf Stone').and_return(evolution_matcher)
+    end
+
+    it { expect(subject).not_to be_usable_item('Leaf Stone') }
+
+    context 'evolution by item' do
+      let(:evolution) { 'New Pokemon' }
+      it { expect(subject).to be_usable_item('Leaf Stone') }
+    end
+  end
+
+  describe '#use_item' do
+    let(:evolution) { nil }
+    let(:evolution_matcher) { double(:evolution_matcher, evolution: evolution) }
+
+    before do
+      allow(Oakdex::Pokemon::EvolutionMatcher).to receive(:new)
+        .with(subject, 'item', item_id: 'Leaf Stone').and_return(evolution_matcher)
+    end
+
+    it { expect(subject.use_item('Leaf Stone')).to be_nil }
+
+    context 'evolution by item' do
+      let(:evolution) { 'NewPokemon' }
+
+      it 'creates growth event' do
+        expect(subject).to receive(:add_growth_event)
+          .with(Oakdex::Pokemon::GrowthEvents::Evolution, evolution: 'NewPokemon')
+        subject.use_item('Leaf Stone')
+      end
+    end
+  end
+
   describe '#increment_level' do
     it 'calls gain_exp' do
       expect(subject).to receive(:gain_exp).with(25)

@@ -117,6 +117,24 @@ while feebas.growth_event? do
 end
 feebas.name # => Milotic
 feebas.trainer # => trainer
+
+# Evolution by item
+exeggcute = Oakdex::Pokemon.create('Exeggcute', level: 12)
+exeggcute.usable_item?('Leaf Stone') # => true
+exeggcute.use_item('Leaf Stone')
+# Exeggcute envolves to Exeggutor
+while exeggcute.growth_event? do
+  e = exeggcute.growth_event
+  if e.read_only?
+    puts e.message
+    e.execute
+  else
+    puts e.message
+    puts e.possible_actions # => ['Continue', 'Skip']
+    e.execute(e.possible_actions.first)
+  end
+end
+exeggcute.name # => Exeggutor
 ```
 
 
