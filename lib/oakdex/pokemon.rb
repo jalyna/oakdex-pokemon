@@ -5,6 +5,7 @@ require 'oakdex/pokemon/stat'
 require 'oakdex/pokemon/move'
 require 'oakdex/pokemon/factory'
 require 'oakdex/pokemon/experience_gain_calculator'
+require 'oakdex/pokemon/growth_events'
 
 module Oakdex
   # Represents detailed pokemon instance
@@ -25,6 +26,7 @@ module Oakdex
     def initialize(species_id, attributes = {})
       @species_id = species_id
       @attributes = attributes
+      @attributes[:growth_events] ||= []
     end
 
     def species
@@ -131,6 +133,63 @@ module Oakdex
       end
     end
 
+    def add_exp(exp_to_add)
+      @attributes[:exp] += exp_to_add
+    end
+
+    def learn_new_move(move_id, replaced_move_id = nil)
+      new_move = Move.create(move_id)
+      if replaced_move_id.nil?
+        @attributes[:moves] << new_move
+      else
+        index = @attributes[:moves]
+          .find_index { |m| m.name == replaced_move_id }
+        @attributes[:moves][index] = new_move if index
+      end
+    end
+
+    def gain_exp(gained_exp)
+      add_growth_event(GrowthEvents::GainedExp, gained_exp: gained_exp)
+    end
+
+    def increment_level
+      gained_exp = exp_next_level - @attributes[:exp]
+      gain_exp(gained_exp)
+    end
+
+    def gain_exp_from_battle(fainted, options = {})
+      exp = ExperienceGainCalculator.calculate(fainted, self, options)
+      gain_exp(exp)
+    end
+
+    def growth_event?
+      !@attributes[:growth_events].empty?
+    end
+
+    def growth_event
+      @attributes[:growth_events].first
+    end
+
+    def remove_growth_event
+      @attributes[:growth_events].shift
+    end
+
+    def add_growth_event(klass, options = {})
+      evt = klass.new(self, options.select { |k, _| k != :after })
+      if options[:after]
+        index = @attributes[:growth_events].index(options[:after])
+        if index.nil?
+          @attributes[:growth_events] << evt
+        else
+          @attributes[:growth_events].insert(index + 1, evt)
+        end
+      else
+        @attributes[:growth_events] << evt
+      end
+
+      evt
+    end
+
     private
 
     def initial_stat(stat)
@@ -145,6 +204,10 @@ module Oakdex
 
     def nature
       @nature ||= Oakdex::Pokedex::Nature.find!(@attributes[:nature_id])
+    end
+
+    def exp_next_level
+      Stat.exp_by_level(species.leveling_rate, level + 1)
     end
   end
 end

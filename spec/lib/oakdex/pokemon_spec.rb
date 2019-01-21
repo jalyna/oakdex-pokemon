@@ -285,4 +285,115 @@ describe Oakdex::Pokemon do
     end
     it { expect(subject.primary_status_condition).to eq('sleep') }
   end
+
+  describe '#add_exp' do
+    it 'increases exp' do
+      subject.add_exp(12)
+      expect(subject.exp).to eq(112)
+    end
+  end
+
+  describe '#learn_new_move' do
+    it 'adds new move' do
+      expect(subject.moves.last.name).not_to eq('Tackle')
+      expect(subject.moves.size).to eq(1)
+      subject.learn_new_move('Tackle')
+      expect(subject.moves.last.name).to eq('Tackle')
+      expect(subject.moves.size).to eq(2)
+    end
+
+    it 'forgets existing move' do
+      expect(subject.moves.last.name).to eq('Thunder Shock')
+      expect(subject.moves.size).to eq(1)
+      subject.learn_new_move('Tackle', 'Thunder Shock')
+      expect(subject.moves.last.name).to eq('Tackle')
+      expect(subject.moves.size).to eq(1)
+    end
+  end
+
+  describe '#gain_exp' do
+    it 'creates growth event' do
+      expect(subject).to receive(:add_growth_event)
+        .with(Oakdex::Pokemon::GrowthEvents::GainedExp, gained_exp: 120)
+      subject.gain_exp(120)
+    end
+  end
+
+  describe '#increment_level' do
+    it 'calls gain_exp' do
+      expect(subject).to receive(:gain_exp).with(25)
+      subject.increment_level
+    end
+  end
+
+  describe '#gain_exp_from_battle' do
+    let(:fainted) { double(:fainted) }
+    it 'calls gain_exp' do
+      expect(Oakdex::Pokemon::ExperienceGainCalculator).to receive(:calculate)
+        .with(fainted, subject, flat: true)
+        .and_return(25)
+      expect(subject).to receive(:gain_exp).with(25)
+      subject.gain_exp_from_battle(fainted, flat: true)
+    end
+  end
+
+  describe '#add_growth_event' do
+    let(:growth_event) { double(:growth_event) }
+    let(:growth_event2) { double(:growth_event) }
+    let(:growth_event3) { double(:growth_event) }
+    let(:klass) { double(:klass) }
+    let(:options) { { option1: 'value' } }
+
+    it 'adds growth event' do
+      expect(klass).to receive(:new).with(subject, options)
+        .and_return(growth_event)
+      subject.add_growth_event(klass, options)
+      expect(subject).to be_growth_event
+      expect(subject.growth_event).to eq(growth_event)
+    end
+
+    it 'adds growth event after other' do
+      expect(klass).to receive(:new).with(subject, options)
+        .and_return(growth_event)
+      subject.add_growth_event(klass, options)
+      expect(klass).to receive(:new).with(subject, option2: 'value')
+        .and_return(growth_event2)
+      subject.add_growth_event(klass, option2: 'value')
+      expect(klass).to receive(:new).with(subject, option3: 'value')
+        .and_return(growth_event3)
+      subject.add_growth_event(klass, option3: 'value', after: growth_event)
+      expect(subject.growth_event).to eq(growth_event)
+      subject.remove_growth_event
+      expect(subject.growth_event).to eq(growth_event3)
+    end
+  end
+
+  describe '#growth_event?' do
+    it { expect(subject).not_to be_growth_event }
+  end
+
+  describe '#growth_event' do
+    it { expect(subject.growth_event).to be_nil }
+  end
+
+  describe 'growring integration' do
+    it 'grows' do
+      pikachu = described_class.create('Pikachu', level: 12)
+      pikachu.gain_exp(20_100)
+      while pikachu.growth_event? do
+        e = pikachu.growth_event
+        if e.read_only?
+          puts e.message
+          e.execute
+        else
+          puts e.message
+          puts e.possible_actions.inspect
+          a = e.possible_actions.sample
+          puts "Execute #{a}"
+          e.execute(a)
+        end
+      end
+      expect(pikachu.level).to eq(27)
+    end
+  end
 end

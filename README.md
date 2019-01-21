@@ -56,20 +56,32 @@ pikachu.change_hp_by(38)
 pikachu.current_hp # => 0
 pikachu.change_pp_by('Thunder Shock', -1)
 pikachu.moves.map { |p| "#{p.name} #{p.pp}" } # => ["Quick Attack 30", "Tail Whip 30", "Growl 40", "Thunder Shock 29"]
+
+pikachu.exp # => 1728
+pikachu.increment_level
+pikachu.level # => 12
+pikachu.exp # => 1728
+
+# Pikachu learns Electro Ball in Level 13
+while pikachu.growth_event? do
+  e = pikachu.growth_event
+  if e.read_only?
+    puts e.message
+    e.execute
+  else
+    puts e.message
+    puts e.possible_actions # => ['Forget Quick Attack', ..., 'Do not learn Electro Ball']
+    e.execute(e.possible_actions.sample)
+  end
+end
+pikachu.level # => 13
+pikachu.exp # => 2197
+
+
+# Calculate exp from won battles
+fainted_opponent = bulbasaur
+pikachu.gain_exp_from_battle(fainted_opponent, using_exp_share: false, flat: false)
 ```
-
-
-### Exp Gain Calculation
-
-```ruby
-fainted = Oakdex::Pokemon.create('Pikachu', level: 10)
-winner = Oakdex::Pokemon.create('Bulbasaur', level: 12)
-
-Oakdex::Pokemon::ExperienceGainCalculator.calculate(fainted, winner) # => 269
-Oakdex::Pokemon::ExperienceGainCalculator.calculate(fainted, winner, flat: true) # => 225
-Oakdex::Pokemon::ExperienceGainCalculator.calculate(fainted, winner, winner_using_exp_share: true) # => 135
-```
-
 
 
 ## Contributing
