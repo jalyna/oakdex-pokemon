@@ -5,6 +5,7 @@ require 'oakdex/pokemon/stat'
 require 'oakdex/pokemon/move'
 require 'oakdex/pokemon/factory'
 require 'oakdex/pokemon/experience_gain_calculator'
+require 'oakdex/pokemon/evolution_matcher'
 require 'oakdex/pokemon/growth_events'
 
 module Oakdex
@@ -51,6 +52,10 @@ module Oakdex
 
     def gender
       @attributes[:gender]
+    end
+
+    def friendship
+      @attributes[:friendship]
     end
 
     def moves
@@ -188,6 +193,14 @@ module Oakdex
       end
 
       evt
+    end
+
+    def envolve_to(species_id)
+      old_max_hp = hp
+      @species = nil
+      @species_id = species_id
+      change_hp_by(hp - old_max_hp) unless fainted?
+      species
     end
 
     private

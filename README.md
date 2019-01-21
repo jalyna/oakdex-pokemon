@@ -77,10 +77,27 @@ end
 pikachu.level # => 13
 pikachu.exp # => 2197
 
-
 # Calculate exp from won battles
 fainted_opponent = bulbasaur
 pikachu.gain_exp_from_battle(fainted_opponent, using_exp_share: false, flat: false)
+
+# Evolution
+charmander = Oakdex::Pokemon.create('Charmander', level: 15)
+charmander.increment_level
+# Charmander envolves to Charmeleon
+while charmander.growth_event? do
+  e = charmander.growth_event
+  if e.read_only?
+    puts e.message
+    e.execute
+  else
+    puts e.message
+    puts e.possible_actions # => ['Continue', 'Skip']
+    e.execute(e.possible_actions.first)
+  end
+end
+charmander.level # => 16
+charmander.name # => Charmeleon
 ```
 
 

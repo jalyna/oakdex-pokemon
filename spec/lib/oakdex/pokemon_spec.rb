@@ -37,7 +37,8 @@ describe Oakdex::Pokemon do
       hp: 12,
       iv: iv,
       ev: ev,
-      moves: [move]
+      moves: [move],
+      friendship: 70
     }.merge(additional_attributes)
   end
   subject { described_class.new(species.names['en'], attributes) }
@@ -81,6 +82,10 @@ describe Oakdex::Pokemon do
 
   describe '#gender' do
     it { expect(subject.gender).to eq('female') }
+  end
+
+  describe '#friendship' do
+    it { expect(subject.friendship).to eq(70) }
   end
 
   describe '#current_hp' do
@@ -337,6 +342,18 @@ describe Oakdex::Pokemon do
     end
   end
 
+  describe '#envolve_to' do
+    let(:new_pokemon) { double(:new_pokemon) }
+    it 'changes species and hp' do
+      allow(Oakdex::Pokedex::Pokemon).to receive(:find!)
+        .with('NewPokemon').and_return(new_pokemon)
+      allow(subject).to receive(:hp).and_return(10, 12)
+      expect(subject).to receive(:change_hp_by).with(2)
+      subject.envolve_to('NewPokemon')
+      expect(subject.species).to eq(new_pokemon)
+    end
+  end
+
   describe '#add_growth_event' do
     let(:growth_event) { double(:growth_event) }
     let(:growth_event2) { double(:growth_event) }
@@ -376,8 +393,8 @@ describe Oakdex::Pokemon do
     it { expect(subject.growth_event).to be_nil }
   end
 
-  describe 'growring integration' do
-    it 'grows' do
+  describe 'growing integration' do
+    it 'learns new moves' do
       pikachu = described_class.create('Pikachu', level: 12)
       pikachu.gain_exp(20_100)
       while pikachu.growth_event? do
@@ -394,6 +411,26 @@ describe Oakdex::Pokemon do
         end
       end
       expect(pikachu.level).to eq(27)
+    end
+
+    it 'envolves' do
+      charmander = described_class.create('Charmander', level: 15)
+      charmander.increment_level
+      while charmander.growth_event? do
+        e = charmander.growth_event
+        if e.read_only?
+          puts e.message
+          e.execute
+        else
+          puts e.message
+          puts e.possible_actions.inspect
+          a = e.possible_actions.first
+          puts "Execute #{a}"
+          e.execute(a)
+        end
+      end
+      expect(charmander.level).to eq(16)
+      expect(charmander.name).to eq('Charmeleon')
     end
   end
 end
