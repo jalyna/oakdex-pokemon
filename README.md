@@ -15,9 +15,8 @@ pikachu = Oakdex::Pokemon.create('Pikachu', level: 12)
 bulbasaur = Oakdex::Pokemon.create('Bulbasaur', { # many options available
   exp: 120,
   gender: 'female',
-  ability: 'Soundproof',
-  nature: 'Bashful',
-  item: 'Earth Plate',
+  ability_id: 'Soundproof',
+  nature_id: 'Bashful',
   hp: 2,
   iv: {
     hp: 8,
