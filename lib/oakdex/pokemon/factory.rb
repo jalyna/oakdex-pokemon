@@ -9,6 +9,7 @@ module Oakdex
         wild
         item_id
         amie
+        friendship
       ]
 
       class << self
@@ -39,6 +40,10 @@ module Oakdex
 
       def wild
         @options[:wild]
+      end
+
+      def friendship
+        @options[:friendship] || @species.base_friendship
       end
 
       def item_id

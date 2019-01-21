@@ -5,6 +5,7 @@ require 'oakdex/pokemon/stat'
 require 'oakdex/pokemon/move'
 require 'oakdex/pokemon/factory'
 require 'oakdex/pokemon/experience_gain_calculator'
+require 'oakdex/pokemon/evolution_matcher'
 require 'oakdex/pokemon/growth_events'
 
 module Oakdex
@@ -51,6 +52,10 @@ module Oakdex
 
     def gender
       @attributes[:gender]
+    end
+
+    def friendship
+      @attributes[:friendship]
     end
 
     def moves

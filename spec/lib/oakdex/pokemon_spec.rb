@@ -37,7 +37,8 @@ describe Oakdex::Pokemon do
       hp: 12,
       iv: iv,
       ev: ev,
-      moves: [move]
+      moves: [move],
+      friendship: 70
     }.merge(additional_attributes)
   end
   subject { described_class.new(species.names['en'], attributes) }
@@ -81,6 +82,10 @@ describe Oakdex::Pokemon do
 
   describe '#gender' do
     it { expect(subject.gender).to eq('female') }
+  end
+
+  describe '#friendship' do
+    it { expect(subject.friendship).to eq(70) }
   end
 
   describe '#current_hp' do

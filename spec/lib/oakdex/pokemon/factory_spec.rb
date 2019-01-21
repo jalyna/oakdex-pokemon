@@ -30,6 +30,7 @@ describe Oakdex::Pokemon do
       double(:species,
              names: { 'en' => 'My Species' },
              leveling_rate: 'leveling_rate',
+             base_friendship: 70,
              gender_ratios: {
                'male' => 25.5,
                'female' => 74.5
@@ -99,6 +100,7 @@ describe Oakdex::Pokemon do
         original_trainer: 'Name of Trainer',
         item_id: 'Name of Item',
         primary_status_condition: 'fire',
+        friendship: 70,
         amie: {
           affection: 1,
           fullness: 2,
