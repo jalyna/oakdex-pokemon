@@ -28,9 +28,7 @@ module Oakdex
       end
 
       def trigger_for(evolution)
-        original_trigger = TRIGGERS.find do |t|
-          evolution[t]
-        end
+        original_trigger = TRIGGERS.find { |t| evolution[t] }
         return 'level_up' if %w[level happiness].include?(original_trigger)
         original_trigger
       end
