@@ -12,6 +12,7 @@ class Oakdex::Pokemon
         level_before = @pokemon.level
         @pokemon.add_exp(@options[:gained_exp])
         last_evt = self
+        puts "XXX #{level_before} #{@pokemon.level}"
         ((level_before + 1)...(@pokemon.level + 1)).to_a.each do |new_level|
           last_evt = @pokemon.add_growth_event(GrowthEvents::LevelUp,
                                                new_level: new_level,

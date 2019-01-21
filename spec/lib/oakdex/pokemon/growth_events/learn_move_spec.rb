@@ -36,6 +36,31 @@ describe Oakdex::Pokemon::GrowthEvents::LearnMove do
   end
 
   describe '#execute' do
-    pending
+    it 'pokemon learns new move' do
+      expect(pokemon).to receive(:learn_new_move).with('Tackle')
+      expect(pokemon).to receive(:remove_growth_event)
+      subject.execute
+    end
+
+    context 'no slot left' do
+      let(:moves) { [move, move2, move3, move4] }
+      
+      it 'does not learn the move' do
+        expect(pokemon).to receive(:add_growth_event)
+          .with(Oakdex::Pokemon::GrowthEvents::DidNotLearnMove,
+            move_id: 'Tackle', after: subject)
+        expect(pokemon).to receive(:remove_growth_event)
+        subject.execute('Do not learn Tackle')
+      end
+      
+      it 'replaces other move' do
+        expect(pokemon).to receive(:learn_new_move).with('Tackle', 'MyMove')
+        expect(pokemon).to receive(:add_growth_event)
+          .with(Oakdex::Pokemon::GrowthEvents::ForgotAndLearnedMove,
+            move_id: 'Tackle', forgot_move_id: 'MyMove', after: subject)
+        expect(pokemon).to receive(:remove_growth_event)
+        subject.execute('Forget MyMove')
+      end
+    end
   end
 end
