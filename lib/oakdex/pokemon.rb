@@ -6,6 +6,7 @@ require 'oakdex/pokemon/move'
 require 'oakdex/pokemon/factory'
 require 'oakdex/pokemon/experience_gain_calculator'
 require 'oakdex/pokemon/evolution_matcher'
+require 'oakdex/pokemon/use_item_service'
 require 'oakdex/pokemon/growth_events'
 
 module Oakdex
@@ -165,14 +166,14 @@ module Oakdex
                        evolution: available_evolution) if available_evolution
     end
 
-    def usable_item?(item_id)
-      !evolution_by_item(item_id).nil?
+    def usable_item?(item_id, options = {})
+      service = UseItemService.new(self, item_id, options)
+      service.usable?
     end
 
-    def use_item(item_id)
-      return unless usable_item?(item_id)
-      add_growth_event(GrowthEvents::Evolution,
-                       evolution: evolution_by_item(item_id))
+    def use_item(item_id, options = {})
+      service = UseItemService.new(self, item_id, options)
+      service.use
     end
 
     def increment_level
@@ -222,10 +223,6 @@ module Oakdex
     end
 
     private
-
-    def evolution_by_item(item_id)
-      EvolutionMatcher.new(self, 'item', item_id: item_id).evolution
-    end
 
     def initial_stat(stat)
       Stat.initial_stat(stat,
