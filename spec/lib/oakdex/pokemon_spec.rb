@@ -352,41 +352,42 @@ describe Oakdex::Pokemon do
   end
 
   describe '#usable_item?' do
-    let(:evolution) { nil }
-    let(:evolution_matcher) { double(:evolution_matcher, evolution: evolution) }
-
+    let(:item_id) { 'My Item' }
+    let(:options) { { some_option: true } }
+    let(:service) { double(:service) }
+    let(:usable) { true }
     before do
-      allow(Oakdex::Pokemon::EvolutionMatcher).to receive(:new)
-        .with(subject, 'item', item_id: 'Leaf Stone').and_return(evolution_matcher)
+      allow(Oakdex::Pokemon::UseItemService).to receive(:new)
+        .with(subject, item_id, options)
+        .and_return(service)
+      allow(service).to receive(:usable?).and_return(usable)
     end
 
-    it { expect(subject).not_to be_usable_item('Leaf Stone') }
+    it { expect(subject.usable_item?(item_id, options)).to be(true) }
 
-    context 'evolution by item' do
-      let(:evolution) { 'New Pokemon' }
-      it { expect(subject).to be_usable_item('Leaf Stone') }
+    context 'not usable' do
+      let(:usable) { false }
+      it { expect(subject.usable_item?(item_id, options)).to be(false) }
     end
   end
 
   describe '#use_item' do
-    let(:evolution) { nil }
-    let(:evolution_matcher) { double(:evolution_matcher, evolution: evolution) }
-
+    let(:item_id) { 'My Item' }
+    let(:options) { { some_option: true } }
+    let(:service) { double(:service) }
+    let(:use) { nil }
     before do
-      allow(Oakdex::Pokemon::EvolutionMatcher).to receive(:new)
-        .with(subject, 'item', item_id: 'Leaf Stone').and_return(evolution_matcher)
+      allow(Oakdex::Pokemon::UseItemService).to receive(:new)
+        .with(subject, item_id, options)
+        .and_return(service)
+      allow(service).to receive(:use).and_return(use)
     end
 
-    it { expect(subject.use_item('Leaf Stone')).to be_nil }
+    it { expect(subject.use_item(item_id, options)).to be_nil }
 
-    context 'evolution by item' do
-      let(:evolution) { 'NewPokemon' }
-
-      it 'creates growth event' do
-        expect(subject).to receive(:add_growth_event)
-          .with(Oakdex::Pokemon::GrowthEvents::Evolution, evolution: 'NewPokemon')
-        subject.use_item('Leaf Stone')
-      end
+    context 'use' do
+      let(:use) { true }
+      it { expect(subject.use_item(item_id, options)).to be(true) }
     end
   end
 
@@ -497,6 +498,44 @@ describe Oakdex::Pokemon do
       end
       expect(charmander.level).to eq(16)
       expect(charmander.name).to eq('Charmeleon')
+    end
+
+    it 'heals hp by item' do
+      charmander = described_class.create('Charmander', level: 15, hp: 32)
+      charmander.use_item('Potion')
+      while charmander.growth_event? do
+        e = charmander.growth_event
+        if e.read_only?
+          puts e.message
+          e.execute
+        else
+          puts e.message
+          puts e.possible_actions.inspect
+          a = e.possible_actions.first
+          puts "Execute #{a}"
+          e.execute(a)
+        end
+      end
+      expect(charmander.current_hp).to eq(charmander.hp)
+    end
+
+    it 'heals status condition by item' do
+      charmander = described_class.create('Charmander', level: 15, primary_status_condition: 'poison')
+      charmander.use_item('Antidote')
+      while charmander.growth_event? do
+        e = charmander.growth_event
+        if e.read_only?
+          puts e.message
+          e.execute
+        else
+          puts e.message
+          puts e.possible_actions.inspect
+          a = e.possible_actions.first
+          puts "Execute #{a}"
+          e.execute(a)
+        end
+      end
+      expect(charmander.primary_status_condition).to be_nil
     end
   end
 end

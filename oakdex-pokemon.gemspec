@@ -11,5 +11,5 @@ Gem::Specification.new do |s|
   s.files       = Dir.glob('lib/**/**') + %w[README.md]
   s.homepage    = 'http://github.com/jalyna/oakdex-pokemon'
   s.license     = 'MIT'
-  s.add_runtime_dependency 'oakdex-pokedex', '>= 0.4.0'
+  s.add_runtime_dependency 'oakdex-pokedex', '>= 0.4.3'
 end
