@@ -500,7 +500,7 @@ describe Oakdex::Pokemon do
       expect(charmander.name).to eq('Charmeleon')
     end
 
-    it 'heals by item' do
+    it 'heals hp by item' do
       charmander = described_class.create('Charmander', level: 15, hp: 32)
       charmander.use_item('Potion')
       while charmander.growth_event? do
@@ -517,6 +517,25 @@ describe Oakdex::Pokemon do
         end
       end
       expect(charmander.current_hp).to eq(charmander.hp)
+    end
+
+    it 'heals status condition by item' do
+      charmander = described_class.create('Charmander', level: 15, primary_status_condition: 'poison')
+      charmander.use_item('Antidote')
+      while charmander.growth_event? do
+        e = charmander.growth_event
+        if e.read_only?
+          puts e.message
+          e.execute
+        else
+          puts e.message
+          puts e.possible_actions.inspect
+          a = e.possible_actions.first
+          puts "Execute #{a}"
+          e.execute(a)
+        end
+      end
+      expect(charmander.primary_status_condition).to be_nil
     end
   end
 end

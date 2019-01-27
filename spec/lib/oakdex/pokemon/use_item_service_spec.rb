@@ -2,7 +2,12 @@ require 'spec_helper'
 
 describe Oakdex::Pokemon::UseItemService do
   let(:fainted) { false }
-  let(:pokemon) { double(:pokemon, fainted?: fainted) }
+  let(:primary_status_condition) { nil }
+  let(:pokemon) do
+    double(:pokemon,
+      fainted?: fainted,
+      primary_status_condition: primary_status_condition)
+  end
   let(:item_id) { 'My Item' }
   let(:effects) { [] }
   let(:item) { double(:item, name: item_id, effects: effects) }
@@ -62,6 +67,31 @@ describe Oakdex::Pokemon::UseItemService do
       end
 
       it { expect(subject).not_to be_usable }
+
+      context 'removes status condition' do
+        let(:effect_options) do
+          {
+            'pokemon_changes' => [
+              {
+                'field' => 'status_condition',
+                'change' => 'remove',
+                'conditions' => ['poison', 'paralysis']
+              }.merge(additional_pokemon_change)
+            ]
+          }
+        end
+        it { expect(subject).not_to be_usable }
+
+        context 'infected with paralysis' do
+          let(:primary_status_condition) { 'paralysis' }
+          it { expect(subject).to be_usable }
+        end
+
+        context 'infected with sleep' do
+          let(:primary_status_condition) { 'sleep' }
+          it { expect(subject).not_to be_usable }
+        end
+      end
 
       context 'not full hp' do
         let(:current_hp) { 10 }
@@ -159,6 +189,27 @@ describe Oakdex::Pokemon::UseItemService do
       before do
         allow(pokemon).to receive(:hp).and_return(20)
         allow(pokemon).to receive(:current_hp).and_return(current_hp)
+      end
+
+      context 'removes status condition' do
+        let(:primary_status_condition) { 'paralysis' }
+        let(:effect_options) do
+          {
+            'pokemon_changes' => [
+              {
+                'field' => 'status_condition',
+                'change' => 'remove',
+                'conditions' => ['poison', 'paralysis']
+              }.merge(additional_pokemon_change)
+            ]
+          }
+        end
+
+        it 'creates growth event' do
+          expect(pokemon).to receive(:add_growth_event)
+            .with(Oakdex::Pokemon::GrowthEvents::RemoveStatusCondition)
+          expect(subject.use).to be(true)
+        end
       end
 
       it 'creates growth event' do

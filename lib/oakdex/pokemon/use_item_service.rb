@@ -57,13 +57,15 @@ module Oakdex
       end
 
       def pokemon_change_applies?(change)
-        !pokemon_field_max?(change['field']) &&
+        !pokemon_field_max?(change) &&
           (!@pokemon.fainted? || (@pokemon.fainted? && change['revive']))
       end
 
-      def pokemon_field_max?(field)
-        case field
+      def pokemon_field_max?(change)
+        case change['field']
         when 'current_hp' then @pokemon.current_hp >= @pokemon.hp
+        when 'status_condition' then !change['conditions']
+          .include?(@pokemon.primary_status_condition)
         end
       end
 
@@ -84,7 +86,12 @@ module Oakdex
       def execute_pokemon_change(change)
         case change['field']
         when 'current_hp' then execute_current_hp_change(change)
+        when 'status_condition' then execute_remove_status_condition(change)
         end
+      end
+
+      def execute_remove_status_condition(_change)
+        @pokemon.add_growth_event(GrowthEvents::RemoveStatusCondition)
       end
 
       def execute_current_hp_change(change)

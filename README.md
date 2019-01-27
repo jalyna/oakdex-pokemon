@@ -150,9 +150,22 @@ while charmander.growth_event? do
   end
 end
 charmander.hp # => 40
-
 charmander.usable_item?('Potion') # => false
 
+
+charmander = Oakdex::Pokemon.create('Charmander', level: 15, primary_status_condition: 'poison')
+charmander.usable_item?('Antidote') # => true
+charmander.use_item('Antidote')
+# Charmander heals status condition
+while charmander.growth_event? do
+  e = charmander.growth_event
+  if e.read_only?
+    puts e.message
+    e.execute # => heals poison
+  end
+end
+charmander.primary_status_condition # => nil
+charmander.usable_item?('Antidote') # => false
 ```
 
 
