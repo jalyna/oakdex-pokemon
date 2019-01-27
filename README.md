@@ -135,6 +135,24 @@ while exeggcute.growth_event? do
   end
 end
 exeggcute.name # => Exeggutor
+
+
+# Item Usage
+charmander = Oakdex::Pokemon.create('Charmander', level: 15, hp: 32)
+charmander.usable_item?('Potion') # => true
+charmander.use_item('Potion')
+# Charmander gets HP
+while charmander.growth_event? do
+  e = charmander.growth_event
+  if e.read_only?
+    puts e.message
+    e.execute # => gains ~8HP
+  end
+end
+charmander.hp # => 40
+
+charmander.usable_item?('Potion') # => false
+
 ```
 
 
