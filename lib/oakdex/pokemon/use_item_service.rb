@@ -14,7 +14,7 @@ module Oakdex
 
       def use
         return unless usable?
-        if !evolution.nil?
+        unless evolution.nil?
           @pokemon.add_growth_event(GrowthEvents::Evolution,
                                     evolution: evolution)
         end
@@ -38,14 +38,14 @@ module Oakdex
       def condition_applies?(effect)
         condition = effect['condition']
         condition == 'Always' ||
-            (in_battle? && condition == 'During Battle') ||
-            (!in_battle? && condition == 'Outside of Battle')
+          (in_battle? && condition == 'During Battle') ||
+          (!in_battle? && condition == 'Outside of Battle')
       end
 
       def target_applies?(effect)
         target = effect['target']
         ['Single Pokemon', 'Single Pokemon > Single Move',
-          'Single Pokemon > All Moves', 'Team'].include?(target)
+         'Single Pokemon > All Moves', 'Team'].include?(target)
       end
 
       def pokemon_changes_apply?(effect)
@@ -77,9 +77,7 @@ module Oakdex
 
       def execute_pokemon_changes(effect)
         (effect['pokemon_changes'] || []).each do |change|
-          if pokemon_change_applies?(change)
-            execute_pokemon_change(change)
-          end
+          execute_pokemon_change(change) if pokemon_change_applies?(change)
         end
       end
 
