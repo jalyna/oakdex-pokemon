@@ -143,6 +143,12 @@ module Oakdex
       @attributes[:exp] += exp_to_add
     end
 
+    def add_ev(stat, ev_to_add)
+      @attributes[:ev] = @attributes[:ev].map do |k, v|
+        [k, k.to_s == stat ? [v + ev_to_add, 255].min : v]
+      end.to_h
+    end
+
     def learn_new_move(move_id, replaced_move_id = nil)
       new_move = Move.create(move_id)
       if replaced_move_id.nil?
@@ -181,9 +187,10 @@ module Oakdex
       gain_exp(gained_exp)
     end
 
-    def gain_exp_from_battle(fainted, options = {})
+    def grow_from_battle(fainted, options = {})
       exp = ExperienceGainCalculator.calculate(fainted, self, options)
       gain_exp(exp)
+      gain_ev_from_battle(fainted) unless options[:using_exp_share]
     end
 
     def growth_event?
@@ -223,6 +230,13 @@ module Oakdex
     end
 
     private
+
+    def gain_ev_from_battle(fainted)
+      fainted.species.ev_yield.each do |stat, value|
+        next if value.zero?
+        add_growth_event(GrowthEvents::GainedEv, stat: stat, value: value)
+      end
+    end
 
     def initial_stat(stat)
       Stat.initial_stat(stat,

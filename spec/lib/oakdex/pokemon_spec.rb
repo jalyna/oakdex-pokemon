@@ -298,6 +298,34 @@ describe Oakdex::Pokemon do
     end
   end
 
+  describe '#add_ev' do
+    let(:add_ev) { 120 }
+    let(:pok2_attributes) do
+      attributes.merge({
+        ev: ev.merge({
+          atk: ev[:atk] + add_ev
+        })
+      })
+    end
+    let(:pok2) { described_class.new(species.names['en'], pok2_attributes) }
+
+    it 'increases ev' do
+      expect(subject.atk).not_to eq(pok2.atk)
+      subject.add_ev('atk', add_ev)
+      expect(subject.atk).to eq(pok2.atk)
+    end
+
+    context 'more than 255' do
+      let(:add_ev) { 245 }
+
+      it 'increases ev to max' do
+        expect(subject.atk).not_to eq(pok2.atk)
+        subject.add_ev('atk', 1000)
+        expect(subject.atk).to eq(pok2.atk)
+      end
+    end
+  end
+
   describe '#learn_new_move' do
     it 'adds new move' do
       expect(subject.moves.last.name).not_to eq('Tackle')
@@ -398,14 +426,37 @@ describe Oakdex::Pokemon do
     end
   end
 
-  describe '#gain_exp_from_battle' do
-    let(:fainted) { double(:fainted) }
-    it 'calls gain_exp' do
+  describe '#grow_from_battle' do
+    let(:fainted_species) do
+      double(:fainted_species, ev_yield: {
+        'def' => 0,
+        'atk' => 2,
+        'hp' => 0
+      })
+    end
+
+    let(:fainted) { double(:fainted, species: fainted_species) }
+
+    it 'calls gain_exp and gain_ev_from_battle' do
       expect(Oakdex::Pokemon::ExperienceGainCalculator).to receive(:calculate)
         .with(fainted, subject, flat: true)
         .and_return(25)
       expect(subject).to receive(:gain_exp).with(25)
-      subject.gain_exp_from_battle(fainted, flat: true)
+      expect(subject).to receive(:add_growth_event)
+        .with(Oakdex::Pokemon::GrowthEvents::GainedEv, stat: 'atk', value: 2)
+      subject.grow_from_battle(fainted, flat: true)
+    end
+
+    context 'exp share' do
+      it 'calls gain_exp but not gain_ev_from_battle' do
+        expect(Oakdex::Pokemon::ExperienceGainCalculator).to receive(:calculate)
+          .with(fainted, subject, flat: true, using_exp_share: true)
+          .and_return(25)
+        expect(subject).to receive(:gain_exp).with(25)
+        expect(subject).not_to receive(:add_growth_event)
+          .with(Oakdex::Pokemon::GrowthEvents::GainedEv, stat: 'atk', value: 2)
+        subject.grow_from_battle(fainted, flat: true, using_exp_share: true)
+      end
     end
   end
 
@@ -498,6 +549,25 @@ describe Oakdex::Pokemon do
       end
       expect(charmander.level).to eq(16)
       expect(charmander.name).to eq('Charmeleon')
+    end
+
+    it 'gains ev from battle' do
+      charmander = described_class.create('Charmander', level: 15)
+      fainted = Oakdex::Pokemon.create('Pikachu', level: 12)
+      charmander.grow_from_battle(fainted)
+      while charmander.growth_event? do
+        e = charmander.growth_event
+        if e.read_only?
+          puts e.message
+          e.execute
+        else
+          puts e.message
+          puts e.possible_actions.inspect
+          a = e.possible_actions.first
+          puts "Execute #{a}"
+          e.execute(a)
+        end
+      end
     end
 
     it 'heals hp by item' do
