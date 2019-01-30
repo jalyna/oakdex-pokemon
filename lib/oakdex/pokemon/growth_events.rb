@@ -8,6 +8,7 @@ end
 
 require 'oakdex/pokemon/growth_events/base'
 require 'oakdex/pokemon/growth_events/gained_exp'
+require 'oakdex/pokemon/growth_events/gained_ev'
 require 'oakdex/pokemon/growth_events/learn_move'
 require 'oakdex/pokemon/growth_events/level_up'
 require 'oakdex/pokemon/growth_events/forgot_and_learned_move'
