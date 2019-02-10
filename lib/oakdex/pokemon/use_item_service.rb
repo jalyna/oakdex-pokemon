@@ -67,13 +67,14 @@ module Oakdex
         case change['field']
         when 'current_hp' then @pokemon.current_hp >= @pokemon.hp
         when 'level' then @pokemon.level >= 100
+        when /^ev_/ then @pokemon.ev_max?(change['field'].sub('ev_', '').to_sym)
         when 'status_condition' then !change['conditions']
           .include?(@pokemon.primary_status_condition)
         end
       end
 
       def independent_fainted?(change)
-        change['field'] == 'level'
+        change['field'] == 'level' || change['field'].start_with?('ev_')
       end
 
       def execute_effects
@@ -93,11 +94,17 @@ module Oakdex
         when 'current_hp' then execute_current_hp_change(change)
         when 'status_condition' then execute_remove_status_condition(change)
         when 'level' then execute_level_up(change)
+        when /^ev_/ then execute_ev_change(change)
         end
       end
 
-      def execute_level_up(change)
+      def execute_level_up(_change)
         @pokemon.increment_level
+      end
+
+      def execute_ev_change(change)
+        stat = change['field'].sub('ev_', '').to_sym
+        @pokemon.add_ev(stat, change['change_by'])
       end
 
       def execute_remove_status_condition(_change)

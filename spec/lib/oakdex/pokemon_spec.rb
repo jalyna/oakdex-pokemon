@@ -298,6 +298,23 @@ describe Oakdex::Pokemon do
     end
   end
 
+  describe '#ev_max?' do
+    it { expect(subject).not_to be_ev_max(:atk) }
+
+    context 'has an ev of 255' do
+      let(:pok2_attributes) do
+        attributes.merge({
+          ev: ev.merge({
+            atk: 255
+          })
+        })
+      end
+      let(:pok2) { described_class.new(species.names['en'], pok2_attributes) }
+
+      it { expect(pok2).to be_ev_max(:atk) }
+    end
+  end
+
   describe '#add_ev' do
     let(:add_ev) { 120 }
     let(:pok2_attributes) do
