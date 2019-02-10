@@ -152,6 +152,10 @@ module Oakdex
       end.to_h
     end
 
+    def ev_max?(stat)
+      @attributes[:ev][stat].to_i >= 255
+    end
+
     def learn_new_move(move_id, replaced_move_id = nil)
       new_move = Move.create(move_id)
       if replaced_move_id.nil?

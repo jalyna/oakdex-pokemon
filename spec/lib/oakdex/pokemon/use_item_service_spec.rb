@@ -87,6 +87,31 @@ describe Oakdex::Pokemon::UseItemService do
         end
       end
 
+      context 'increase ev (like vitamins or wings)' do
+        let(:additional_pokemon_change) do
+          {
+            'field' => 'ev_atk',
+            'change_by' => 10
+          }
+        end
+
+        before do
+          allow(pokemon).to receive(:ev_max?)
+            .with(:atk).and_return(false)
+        end
+
+        it { expect(subject).to be_usable }
+
+        context 'pokemon has max ev' do
+          before do
+            allow(pokemon).to receive(:ev_max?)
+              .with(:atk).and_return(true)
+          end
+
+          it { expect(subject).not_to be_usable }
+        end
+      end
+
       context 'removes status condition' do
         let(:effect_options) do
           {
@@ -220,6 +245,25 @@ describe Oakdex::Pokemon::UseItemService do
 
         it 'calls increment_level' do
           expect(pokemon).to receive(:increment_level)
+          expect(subject.use).to be(true)
+        end
+      end
+
+      context 'increase ev (like vitamins or wings)' do
+        let(:additional_pokemon_change) do
+          {
+            'field' => 'ev_atk',
+            'change_by' => 10
+          }
+        end
+
+        before do
+          allow(pokemon).to receive(:ev_max?)
+            .with(:atk).and_return(false)
+        end
+
+        it 'calls add_ev' do
+          expect(pokemon).to receive(:add_ev).with(:atk, 10)
           expect(subject.use).to be(true)
         end
       end
