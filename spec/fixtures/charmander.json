@@ -1,0 +1,55 @@
+{
+  "exp": 2035,
+  "gender": "male",
+  "ability_id": "Blaze",
+  "nature_id": "Naughty",
+  "hp": 39,
+  "iv": {
+    "hp": 19,
+    "atk": 31,
+    "def": 1,
+    "sp_atk": 13,
+    "sp_def": 7,
+    "speed": 22
+  },
+  "ev": {
+    "hp": 0,
+    "atk": 0,
+    "def": 0,
+    "sp_atk": 0,
+    "sp_def": 0,
+    "speed": 0
+  },
+  "moves": [
+    {
+      "move_id": "Smokescreen",
+      "pp": 20,
+      "max_pp": 20
+    },
+    {
+      "move_id": "Growl",
+      "pp": 40,
+      "max_pp": 40
+    },
+    {
+      "move_id": "Scratch",
+      "pp": 35,
+      "max_pp": 35
+    },
+    {
+      "move_id": "Ember",
+      "pp": 25,
+      "max_pp": 25
+    }
+  ],
+  "original_trainer": null,
+  "primary_status_condition": null,
+  "wild": null,
+  "item_id": null,
+  "amie": null,
+  "friendship": 70,
+  "growth_events": [
+
+  ],
+  "species_id": "Charmander"
+}

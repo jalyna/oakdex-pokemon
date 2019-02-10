@@ -46,6 +46,14 @@ module Oakdex
       def type
         Oakdex::Pokedex::Type.find!(type_id)
       end
+
+      def to_h
+        {
+          move_id: @move_type.name,
+          pp: @pp,
+          max_pp: @max_pp
+        }
+      end
     end
   end
 end

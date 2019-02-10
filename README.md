@@ -168,6 +168,15 @@ charmander.primary_status_condition # => nil
 charmander.usable_item?('Antidote') # => false
 ```
 
+### Import and export Pokemon
+
+```ruby
+squirtle = Oakdex::Pokemon.create('Squirtle', level: 12)
+json = squirtle.to_json
+# Might throw Oakdex::Pokemon::InvalidPokemon
+identical_squirtle = Oakdex::Pokemon.from_json(json)
+```
+
 
 ## Contributing
 

@@ -25,6 +25,13 @@ class Oakdex::Pokemon
         remove_event
       end
 
+      def to_h
+        {
+          name: self.class.name,
+          options: @options
+        }
+      end
+
       private
 
       def remove_event
