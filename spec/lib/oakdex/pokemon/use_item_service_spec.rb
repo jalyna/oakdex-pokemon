@@ -3,8 +3,10 @@ require 'spec_helper'
 describe Oakdex::Pokemon::UseItemService do
   let(:fainted) { false }
   let(:primary_status_condition) { nil }
+  let(:level) { 10 }
   let(:pokemon) do
     double(:pokemon,
+      level: level,
       fainted?: fainted,
       primary_status_condition: primary_status_condition)
   end
@@ -67,6 +69,23 @@ describe Oakdex::Pokemon::UseItemService do
       end
 
       it { expect(subject).not_to be_usable }
+
+      context 'change level (like with rare candy)' do
+        let(:additional_pokemon_change) do
+          {
+            'field' => 'level',
+            'change_by' => 1
+          }
+        end
+
+        it { expect(subject).to be_usable }
+
+        context 'pokemon is level 100' do
+          let(:level) { 100 }
+
+          it { expect(subject).not_to be_usable }
+        end
+      end
 
       context 'removes status condition' do
         let(:effect_options) do
@@ -189,6 +208,20 @@ describe Oakdex::Pokemon::UseItemService do
       before do
         allow(pokemon).to receive(:hp).and_return(20)
         allow(pokemon).to receive(:current_hp).and_return(current_hp)
+      end
+
+      context 'change level (like with rare candy)' do
+        let(:additional_pokemon_change) do
+          {
+            'field' => 'level',
+            'change_by' => 1
+          }
+        end
+
+        it 'calls increment_level' do
+          expect(pokemon).to receive(:increment_level)
+          expect(subject.use).to be(true)
+        end
       end
 
       context 'removes status condition' do
