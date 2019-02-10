@@ -152,6 +152,24 @@ end
 charmander.hp # => 40
 charmander.usable_item?('Potion') # => false
 
+# Increase pp by PP Up
+exeggcute = Oakdex::Pokemon.create('Exeggcute', level: 12)
+exeggcute.usable_item?('PP Up') # => true
+exeggcute.use_item('PP Up')
+# Exeggcute can increase pp of a mvoe
+while exeggcute.growth_event? do
+  e = exeggcute.growth_event
+  if e.read_only?
+    puts e.message
+    e.execute
+  else
+    puts e.message
+    puts e.possible_actions # => name of moves
+    e.execute(e.possible_actions.first)
+  end
+end
+exeggcute.moves.first.max_pp # => Changed
+
 
 charmander = Oakdex::Pokemon.create('Charmander', level: 15, primary_status_condition: 'poison')
 charmander.usable_item?('Antidote') # => true

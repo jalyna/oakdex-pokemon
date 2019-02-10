@@ -656,5 +656,24 @@ describe Oakdex::Pokemon do
       end
       expect(charmander.primary_status_condition).to be_nil
     end
+
+    it 'increases max pp by item' do
+      charmander = described_class.create('Charmander', level: 15)
+      charmander.use_item('PP Up')
+      while charmander.growth_event? do
+        e = charmander.growth_event
+        if e.read_only?
+          puts e.message
+          e.execute
+        else
+          puts e.message
+          puts e.possible_actions.inspect
+          a = e.possible_actions.first
+          puts "Execute #{a}"
+          e.execute(a)
+        end
+      end
+      expect(charmander.moves.first.max_pp).not_to eq(charmander.moves.first.move_type.pp)
+    end
   end
 end

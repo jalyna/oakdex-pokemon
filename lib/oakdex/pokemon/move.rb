@@ -11,7 +11,7 @@ module Oakdex
 
       extend Forwardable
 
-      attr_reader :max_pp
+      attr_reader :max_pp, :move_type
       attr_accessor :pp
 
       def_delegators :@move_type, :target, :priority, :accuracy,
@@ -37,6 +37,16 @@ module Oakdex
 
       def name
         @move_type.names['en']
+      end
+
+      def max_pp_at_max?
+        @max_pp >= @move_type.max_pp
+      end
+
+      def add_max_pp(change_by)
+        old = max_pp
+        @max_pp = [max_pp + change_by, @move_type.max_pp].min
+        @pp += @max_pp - old
       end
 
       def type_id

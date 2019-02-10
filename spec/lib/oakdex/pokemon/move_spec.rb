@@ -1,8 +1,9 @@
 require 'spec_helper'
 
 describe Oakdex::Pokemon::Move do
+  let(:max_pp) { 30 }
   let(:move_type) { Oakdex::Pokedex::Move.find('Thunder Shock') }
-  subject { described_class.new(move_type, 30, 30) }
+  subject { described_class.new(move_type, 30, max_pp) }
 
   describe '.create' do
     it 'creates move by given id' do
@@ -26,6 +27,33 @@ describe Oakdex::Pokemon::Move do
 
   describe '#type' do
     it { expect(subject.type).to eq(Oakdex::Pokedex::Type.find('Electric')) }
+  end
+
+  describe '#max_pp_at_max?' do
+    it { expect(subject).not_to be_max_pp_at_max }
+
+    context 'pp is max at 48' do
+      let(:max_pp) { 48 }
+      it { expect(subject).to be_max_pp_at_max }
+    end
+  end
+
+  describe '#add_max_pp' do
+    it 'increases max pp and pp' do
+      subject.add_max_pp(3)
+      expect(subject.max_pp).to eq(33)
+      expect(subject.pp).to eq(33)
+    end
+
+    context 'pp is nearly reached' do
+      let(:max_pp) { 45 }
+
+      it 'increases max pp and pp until maximum' do
+        subject.add_max_pp(20)
+        expect(subject.max_pp).to eq(48)
+        expect(subject.pp).to eq(33)
+      end
+    end
   end
 
   %i[target priority accuracy category power stat_modifiers in_battle_properties].each do |attr|
