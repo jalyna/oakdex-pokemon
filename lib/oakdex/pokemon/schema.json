@@ -1,0 +1,237 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "Pokemon",
+  "definitions": {
+    "ev_stats": {
+      "type": "object",
+      "properties": {
+        "hp": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "atk": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "def": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "sp_atk": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "sp_def": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "speed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        }
+      },
+      "required": [
+        "hp",
+        "atk",
+        "def",
+        "sp_atk",
+        "sp_def",
+        "speed"
+      ],
+      "additionalProperties": false
+    },
+    "iv_stats": {
+      "type": "object",
+      "properties": {
+        "hp": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 31
+        },
+        "atk": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 31
+        },
+        "def": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 31
+        },
+        "sp_atk": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 31
+        },
+        "sp_def": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 31
+        },
+        "speed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 31
+        }
+      },
+      "required": [
+        "hp",
+        "atk",
+        "def",
+        "sp_atk",
+        "sp_def",
+        "speed"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "species_id": {
+      "type": "string"
+    },
+    "exp": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1640000
+    },
+    "gender": {
+      "type": "string",
+      "enum": [
+        "male",
+        "female",
+        "neuter"
+      ]
+    },
+    "ability_id": {
+      "type": "string"
+    },
+    "item_id": {
+      "type": ["string", "null"]
+    },
+    "nature_id": {
+      "type": "string"
+    },
+    "hp": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 10000000
+    },
+    "friendship": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 255
+    },
+    "original_trainer": {
+      "type": ["string", "null"]
+    },
+    "ev": {
+      "$ref": "#/definitions/ev_stats"
+    },
+    "iv": {
+      "$ref": "#/definitions/iv_stats"
+    },
+    "primary_status_condition": {
+      "type": ["string", "null"],
+      "enum": [
+        "poison",
+        "bad_poison",
+        "paralysis",
+        "sleep",
+        "freeze",
+        "burn",
+        null
+      ]
+    },
+    "wild": {
+      "type": ["boolean", "null"]
+    },
+    "moves": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "move_id": {
+            "type": "string"
+          },
+          "pp": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 50
+          },
+          "max_pp": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 50
+          }
+        },
+        "required": [
+          "move_id",
+          "pp",
+          "max_pp"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "amie": {
+      "type": ["object", "null"],
+      "properties": {
+        "affection": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "fullness": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "enjoyment": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        }
+      },
+      "additionalProperties": false
+    },
+    "growth_events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "options": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "name",
+          "options"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "species_id",
+    "exp",
+    "ability_id",
+    "gender",
+    "nature_id",
+    "hp",
+    "iv",
+    "ev",
+    "moves",
+    "friendship"
+  ],
+  "additionalProperties": false
+}

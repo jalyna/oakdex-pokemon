@@ -1,4 +1,5 @@
 require 'forwardable'
+require 'json'
 require 'oakdex/pokedex'
 
 require 'oakdex/pokemon/stat'
@@ -8,6 +9,7 @@ require 'oakdex/pokemon/experience_gain_calculator'
 require 'oakdex/pokemon/evolution_matcher'
 require 'oakdex/pokemon/use_item_service'
 require 'oakdex/pokemon/growth_events'
+require 'oakdex/pokemon/import'
 
 module Oakdex
   # Represents detailed pokemon instance
@@ -29,6 +31,7 @@ module Oakdex
       @species_id = species_id
       @attributes = attributes
       @attributes[:growth_events] ||= []
+      species
     end
 
     def species
@@ -229,7 +232,23 @@ module Oakdex
       species
     end
 
+    def to_json
+      JSON.dump(to_h)
+    end
+
+    def self.from_json(json)
+      Import.new(json).import!
+    end
+
     private
+
+    def to_h
+      @attributes.dup.tap do |attributes|
+        attributes[:species_id] = species.name
+        attributes[:moves] = attributes[:moves].map(&:to_h)
+        attributes[:growth_events] = attributes[:growth_events].map(&:to_h)
+      end
+    end
 
     def gain_ev_from_battle(fainted)
       fainted.species.ev_yield.each do |stat, value|

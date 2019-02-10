@@ -462,9 +462,15 @@ describe Oakdex::Pokemon do
 
   describe '#envolve_to' do
     let(:new_pokemon) { double(:new_pokemon) }
-    it 'changes species and hp' do
+
+    before do
+      allow(Oakdex::Pokedex::Pokemon).to receive(:find!)
+        .with('Pikachu').and_call_original
       allow(Oakdex::Pokedex::Pokemon).to receive(:find!)
         .with('NewPokemon').and_return(new_pokemon)
+    end
+
+    it 'changes species and hp' do
       allow(subject).to receive(:hp).and_return(10, 12)
       expect(subject).to receive(:change_hp_by).with(2)
       subject.envolve_to('NewPokemon')
@@ -500,6 +506,32 @@ describe Oakdex::Pokemon do
       expect(subject.growth_event).to eq(growth_event)
       subject.remove_growth_event
       expect(subject.growth_event).to eq(growth_event3)
+    end
+  end
+
+  describe '#to_json' do
+    let(:json) do
+      File.read(File.expand_path('./spec/fixtures/pikachu.json'))
+    end
+
+    it 'generates hash' do
+      expect(JSON.parse(subject.to_json)).to eq(JSON.parse(json))
+    end
+  end
+
+  describe '.from_json' do
+    let(:json) do
+      File.read(File.expand_path('./spec/fixtures/pikachu.json'))
+    end
+
+    let(:importer) { double(:importer) }
+    let(:pokemon) { double(:pokemon) }
+
+    it 'uses importer' do
+      allow(Oakdex::Pokemon::Import).to receive(:new).with(json)
+        .and_return(importer)
+      allow(importer).to receive(:import!).and_return(pokemon)
+      expect(described_class.from_json(json)).to eq(pokemon)
     end
   end
 
