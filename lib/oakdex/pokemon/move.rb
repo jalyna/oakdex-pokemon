@@ -43,10 +43,18 @@ module Oakdex
         @max_pp >= @move_type.max_pp
       end
 
+      def pp_max?
+        @pp >= @max_pp
+      end
+
       def add_max_pp(change_by)
         old = max_pp
         @max_pp = [max_pp + change_by, @move_type.max_pp].min
         @pp += @max_pp - old
+      end
+
+      def add_pp(change_by)
+        @pp = [@pp + change_by, @max_pp].min
       end
 
       def type_id

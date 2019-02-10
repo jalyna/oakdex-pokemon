@@ -78,6 +78,7 @@ module Oakdex
       def move_field_max?(change)
         case change['field']
         when 'max_pp' then @pokemon.moves.all?(&:max_pp_at_max?)
+        when 'pp' then @pokemon.moves.all?(&:pp_max?)
         end
       end
 
@@ -111,7 +112,7 @@ module Oakdex
 
       def execute_move_changes(effect)
         (effect['move_changes'] || []).each do |change|
-          execute_move_change(change) if move_change_applies?(change)
+          execute_move_change(change, effect) if move_change_applies?(change)
         end
       end
 
@@ -124,9 +125,10 @@ module Oakdex
         end
       end
 
-      def execute_move_change(change)
+      def execute_move_change(change, effect)
         case change['field']
         when 'max_pp' then execute_add_max_pp(change)
+        when 'pp' then execute_add_pp(change, effect)
         end
       end
 
@@ -149,6 +151,33 @@ module Oakdex
           [move.name, change_for_move(move, change)]
         end.compact.to_h
         @pokemon.add_growth_event(GrowthEvents::IncreaseMaxPp, moves: moves)
+      end
+
+      def execute_add_pp(change, effect)
+        if effect['target'] == 'Single Pokemon > All Moves'
+          @pokemon.moves.each do |move|
+            next if move.pp_max?
+            @pokemon.add_growth_event(
+              GrowthEvents::IncreaseMovePp,
+              move_id: move.name,
+              change_by: pp_change_for_move(move, change)
+            )
+          end
+        else
+          moves = @pokemon.moves.map do |move|
+            next if move.pp_max?
+            [move.name, pp_change_for_move(move, change)]
+          end.compact.to_h
+          @pokemon.add_growth_event(GrowthEvents::IncreasePp, moves: moves)
+        end
+      end
+
+      def pp_change_for_move(move, change)
+        if change['change_by_percent']
+          (move.max_pp.to_f * (change['change_by_percent'].to_f / 100)).to_i
+        else
+          change['change_by']
+        end
       end
 
       def change_for_move(move, change)

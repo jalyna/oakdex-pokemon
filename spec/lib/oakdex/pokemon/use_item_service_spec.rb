@@ -6,8 +6,8 @@ describe Oakdex::Pokemon::UseItemService do
   let(:level) { 10 }
   let(:move_type_pp) { 10 }
   let(:move_type) { double(:move_type, pp: move_type_pp) }
-  let(:move1) { double(:move1, name: 'Move1', move_type: move_type) }
-  let(:move2) { double(:move2, name: 'Move2') }
+  let(:move1) { double(:move1, name: 'Move1', move_type: move_type, max_pp: 20) }
+  let(:move2) { double(:move2, name: 'Move2', max_pp: 30) }
   let(:moves) { [move1, move2] }
   let(:pokemon) do
     double(:pokemon,
@@ -115,6 +115,34 @@ describe Oakdex::Pokemon::UseItemService do
           end
 
           it { expect(subject).not_to be_usable }
+        end
+      end
+
+      context 'increases pp (like max ether)' do
+        let(:effect_options) do
+          {
+            'move_changes' => [
+              {
+                'field' => 'pp',
+                'change_by_percent' => 50
+              }
+            ]
+          }
+        end
+
+        before do
+          allow(move1).to receive(:pp_max?).and_return(true)
+          allow(move2).to receive(:pp_max?).and_return(true)
+        end
+
+        it { expect(subject).not_to be_usable }
+
+        context 'pp is not at max' do
+          before do
+            allow(move1).to receive(:pp_max?).and_return(false)
+          end
+
+          it { expect(subject).to be_usable }
         end
       end
 
@@ -337,6 +365,49 @@ describe Oakdex::Pokemon::UseItemService do
               .with(Oakdex::Pokemon::GrowthEvents::IncreaseMaxPp, moves: {
                 move1.name => 3
               })
+            expect(subject.use).to be(true)
+          end
+        end
+      end
+
+      context 'increases pp (like max ether)' do
+        let(:effect_options) do
+          {
+            'move_changes' => [
+              {
+                'field' => 'pp',
+                'change_by_percent' => 50
+              }
+            ]
+          }
+        end
+
+        before do
+          allow(move1).to receive(:pp_max?).and_return(false)
+          allow(move2).to receive(:pp_max?).and_return(true)
+        end
+
+        it 'creates growth event' do
+          expect(pokemon).to receive(:add_growth_event)
+            .with(Oakdex::Pokemon::GrowthEvents::IncreasePp, moves: {
+              move1.name => 10
+            })
+          expect(subject.use).to be(true)
+        end
+
+        context 'all moves are target' do
+          let(:target) { 'Single Pokemon > All Moves' }
+
+          before do
+            allow(move1).to receive(:pp_max?).and_return(false)
+            allow(move2).to receive(:pp_max?).and_return(false)
+          end
+
+          it 'creates growth event' do
+            expect(pokemon).to receive(:add_growth_event)
+              .with(Oakdex::Pokemon::GrowthEvents::IncreaseMovePp, move_id: move1.name, change_by: 10)
+            expect(pokemon).to receive(:add_growth_event)
+              .with(Oakdex::Pokemon::GrowthEvents::IncreaseMovePp, move_id: move2.name, change_by: 15)
             expect(subject.use).to be(true)
           end
         end
