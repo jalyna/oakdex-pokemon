@@ -22,6 +22,10 @@ module Oakdex
 
     attr_accessor :trainer
 
+    def self.root
+      File.expand_path '../../../', __FILE__
+    end
+
     def self.create(species_name, options = {})
       species = Oakdex::Pokedex::Pokemon.find!(species_name)
       Factory.create(species, options)

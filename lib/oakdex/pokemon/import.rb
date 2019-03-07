@@ -6,10 +6,9 @@ module Oakdex
   class Pokemon
     # Imports and validates pokemon
     class Import
-      SCHEMA_PATH = './lib/oakdex/pokemon/schema.json'.freeze
-
       def self.schema
-        @schema ||= File.read(File.expand_path(SCHEMA_PATH))
+        schema_path = File.join Oakdex::Pokemon.root, 'lib', 'oakdex', 'pokemon', 'schema.json'
+        @schema ||= File.read(File.expand_path(schema_path))
       end
 
       def initialize(data)
