@@ -132,6 +132,15 @@ describe Oakdex::Pokemon do
     it { expect(subject.speed).to eq(12) }
   end
 
+  describe '#dup' do
+    it 'duplicates moves, too' do
+      duplicated = subject.dup
+      expect(duplicated.object_id).not_to eq(subject.object_id)
+      expect(duplicated.species.object_id).to eq(subject.species.object_id)
+      expect(duplicated.moves.first.object_id).not_to eq(subject.moves.first.object_id)
+    end
+  end
+
   describe '#moves_with_pp' do
     it { expect(subject.moves_with_pp).to eq([move]) }
 
@@ -253,23 +262,29 @@ describe Oakdex::Pokemon do
   end
 
   describe '#amie' do
-    it { expect(subject.amie).to eq({
-      affection: 0,
-      fullness: 0,
-      enjoyment: 0
-    }) }
+    it {
+      expect(subject.amie).to eq(
+        affection: 0,
+        fullness: 0,
+        enjoyment: 0
+      )
+    }
 
     context 'amie given' do
-      let(:additional_attributes) { { amie: {
-        affection: 1,
-        fullness: 2,
-        enjoyment: 3
-      } } }
-      it { expect(subject.amie).to eq({
-        affection: 1,
-        fullness: 2,
-        enjoyment: 3
-      }) }
+      let(:additional_attributes) do
+        { amie: {
+          affection: 1,
+          fullness: 2,
+          enjoyment: 3
+        } }
+      end
+      it {
+        expect(subject.amie).to eq(
+          affection: 1,
+          fullness: 2,
+          enjoyment: 3
+        )
+      }
     end
   end
 
@@ -277,9 +292,11 @@ describe Oakdex::Pokemon do
     it { expect(subject.amie_level(:affection)).to eq(0) }
 
     context 'amie given' do
-      let(:additional_attributes) { { amie: {
-        affection: 201
-      } } }
+      let(:additional_attributes) do
+        { amie: {
+          affection: 201
+        } }
+      end
       it { expect(subject.amie_level(:affection)).to eq(4) }
     end
   end
@@ -303,11 +320,11 @@ describe Oakdex::Pokemon do
 
     context 'has an ev of 255' do
       let(:pok2_attributes) do
-        attributes.merge({
-          ev: ev.merge({
+        attributes.merge(
+          ev: ev.merge(
             atk: 255
-          })
-        })
+          )
+        )
       end
       let(:pok2) { described_class.new(species.names['en'], pok2_attributes) }
 
@@ -318,11 +335,11 @@ describe Oakdex::Pokemon do
   describe '#add_ev' do
     let(:add_ev) { 120 }
     let(:pok2_attributes) do
-      attributes.merge({
-        ev: ev.merge({
+      attributes.merge(
+        ev: ev.merge(
           atk: ev[:atk] + add_ev
-        })
-      })
+        )
+      )
     end
     let(:pok2) { described_class.new(species.names['en'], pok2_attributes) }
 
@@ -446,10 +463,10 @@ describe Oakdex::Pokemon do
   describe '#grow_from_battle' do
     let(:fainted_species) do
       double(:fainted_species, ev_yield: {
-        'def' => 0,
-        'atk' => 2,
-        'hp' => 0
-      })
+               'def' => 0,
+               'atk' => 2,
+               'hp' => 0
+             })
     end
 
     let(:fainted) { double(:fainted, species: fainted_species) }
@@ -564,7 +581,7 @@ describe Oakdex::Pokemon do
     it 'learns new moves' do
       pikachu = described_class.create('Pikachu', level: 12)
       pikachu.gain_exp(20_100)
-      while pikachu.growth_event? do
+      while pikachu.growth_event?
         e = pikachu.growth_event
         if e.read_only?
           puts e.message
@@ -583,7 +600,7 @@ describe Oakdex::Pokemon do
     it 'envolves' do
       charmander = described_class.create('Charmander', level: 15)
       charmander.increment_level
-      while charmander.growth_event? do
+      while charmander.growth_event?
         e = charmander.growth_event
         if e.read_only?
           puts e.message
@@ -604,7 +621,7 @@ describe Oakdex::Pokemon do
       charmander = described_class.create('Charmander', level: 15)
       fainted = Oakdex::Pokemon.create('Pikachu', level: 12)
       charmander.grow_from_battle(fainted)
-      while charmander.growth_event? do
+      while charmander.growth_event?
         e = charmander.growth_event
         if e.read_only?
           puts e.message
@@ -622,7 +639,7 @@ describe Oakdex::Pokemon do
     it 'heals hp by item' do
       charmander = described_class.create('Charmander', level: 15, hp: 32)
       charmander.use_item('Potion')
-      while charmander.growth_event? do
+      while charmander.growth_event?
         e = charmander.growth_event
         if e.read_only?
           puts e.message
@@ -641,7 +658,7 @@ describe Oakdex::Pokemon do
     it 'heals status condition by item' do
       charmander = described_class.create('Charmander', level: 15, primary_status_condition: 'poison')
       charmander.use_item('Antidote')
-      while charmander.growth_event? do
+      while charmander.growth_event?
         e = charmander.growth_event
         if e.read_only?
           puts e.message
@@ -660,7 +677,7 @@ describe Oakdex::Pokemon do
     it 'increases max pp by item' do
       charmander = described_class.create('Charmander', level: 15)
       charmander.use_item('PP Up')
-      while charmander.growth_event? do
+      while charmander.growth_event?
         e = charmander.growth_event
         if e.read_only?
           puts e.message
@@ -680,7 +697,7 @@ describe Oakdex::Pokemon do
       charmander = described_class.create('Charmander', level: 15)
       charmander.change_pp_by(charmander.moves.first.name, -100)
       charmander.use_item('Max Elixir')
-      while charmander.growth_event? do
+      while charmander.growth_event?
         e = charmander.growth_event
         if e.read_only?
           puts e.message

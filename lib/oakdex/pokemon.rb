@@ -240,6 +240,16 @@ module Oakdex
       species
     end
 
+    def dup
+      duplicated = super
+      new_attributes = @attributes.dup
+      new_attributes[:moves] = new_attributes[:moves].map(&:dup)
+      new_attributes[:growth_events] = new_attributes[:growth_events].map(&:dup)
+      duplicated.instance_variable_set(:@attributes, new_attributes)
+
+      duplicated
+    end
+
     def to_json
       JSON.dump(to_h)
     end
