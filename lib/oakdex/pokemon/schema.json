@@ -141,7 +141,7 @@
       "type": ["string", "null"],
       "enum": [
         "poison",
-        "bad_poison",
+        "badly_poisoned",
         "paralysis",
         "sleep",
         "freeze",

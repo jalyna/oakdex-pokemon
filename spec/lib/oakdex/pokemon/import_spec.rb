@@ -50,7 +50,7 @@ describe Oakdex::Pokemon::Import do
       json['primary_status_condition'] = 'foobar'
       importer = described_class.new(JSON.dump(json))
       expect { importer.import! }.to raise_error(Oakdex::Pokemon::InvalidPokemon,
-        "The property '#/primary_status_condition' value \"foobar\" did not match one of the following values: poison, bad_poison, paralysis, sleep, freeze, burn, null")
+        "The property '#/primary_status_condition' value \"foobar\" did not match one of the following values: poison, badly_poisoned, paralysis, sleep, freeze, burn, null")
     end
 
     it 'raises error when relation was not found' do
