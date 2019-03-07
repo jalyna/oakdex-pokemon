@@ -33,6 +33,8 @@ module Oakdex
           next if k == 'species_id' || k == 'growth_events'
           if k == 'moves'
             [:moves, moves]
+          elsif v.is_a?(Hash)
+            [k.to_sym, v.map { |k2, v2| [k2.to_sym, v2] }.to_h]
           else
             [k.to_sym, v]
           end

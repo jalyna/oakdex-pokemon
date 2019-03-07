@@ -32,6 +32,7 @@ describe Oakdex::Pokemon::Import do
       importer = described_class.new(pok.to_json)
       expect(importer.import!.to_json).to eq(pok.to_json)
       expect(importer.import!.moves.first.name).to eq(pok.moves.first.name)
+      expect(importer.import!.atk).to eq(pok.atk)
     end
 
     it 'imports and exports with growth events' do
