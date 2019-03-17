@@ -577,6 +577,22 @@ describe Oakdex::Pokemon do
     it { expect(subject.growth_event).to be_nil }
   end
 
+  describe '#enable_battle_mode' do
+    it 'excludes evolution growth event' do
+      subject.enable_battle_mode
+      subject.add_growth_event(Oakdex::Pokemon::GrowthEvents::Evolution)
+      expect(subject).not_to be_growth_event
+      subject.add_growth_event(Oakdex::Pokemon::GrowthEvents::Revive)
+      expect(subject).to be_growth_event
+      expect(subject.growth_event).to be_instance_of(Oakdex::Pokemon::GrowthEvents::Revive)
+      subject.remove_growth_event
+      expect(subject).not_to be_growth_event
+      subject.disable_battle_mode
+      expect(subject).to be_growth_event
+      expect(subject.growth_event).to be_instance_of(Oakdex::Pokemon::GrowthEvents::Evolution)
+    end
+  end
+
   describe 'growing integration' do
     it 'learns new moves' do
       pikachu = described_class.create('Pikachu', level: 12)

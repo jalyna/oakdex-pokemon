@@ -34,6 +34,7 @@ module Oakdex
     def initialize(species_id, attributes = {})
       @species_id = species_id
       @attributes = attributes
+      @battle_mode = false
       @attributes[:growth_events] ||= []
       species
     end
@@ -204,16 +205,28 @@ module Oakdex
       gain_ev_from_battle(fainted) unless options[:using_exp_share]
     end
 
+    def enable_battle_mode
+      @battle_mode = true
+    end
+
+    def disable_battle_mode
+      @battle_mode = false
+    end
+
     def growth_event?
-      !@attributes[:growth_events].empty?
+      !growth_events.empty?
     end
 
     def growth_event
-      @attributes[:growth_events].first
+      growth_events.first
     end
 
     def remove_growth_event
-      @attributes[:growth_events].shift
+      remove_event = growth_event
+      return unless remove_event
+      @attributes[:growth_events] = @attributes[:growth_events].select do |e|
+        e != remove_event
+      end
     end
 
     def add_growth_event(klass, options = {})
@@ -265,6 +278,16 @@ module Oakdex
         attributes[:species_id] = species.name
         attributes[:moves] = attributes[:moves].map(&:to_h)
         attributes[:growth_events] = attributes[:growth_events].map(&:to_h)
+      end
+    end
+
+    def growth_events
+      if @battle_mode
+        @attributes[:growth_events].select do |e|
+          !e.instance_of?(Oakdex::Pokemon::GrowthEvents::Evolution)
+        end
+      else
+        @attributes[:growth_events]
       end
     end
 
