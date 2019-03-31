@@ -271,8 +271,6 @@ module Oakdex
       Import.new(json).import!
     end
 
-    private
-
     def to_h
       @attributes.dup.tap do |attributes|
         attributes[:species_id] = species.name
@@ -280,6 +278,8 @@ module Oakdex
         attributes[:growth_events] = attributes[:growth_events].map(&:to_h)
       end
     end
+
+    private
 
     def growth_events
       if @battle_mode
