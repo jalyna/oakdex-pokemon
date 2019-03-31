@@ -553,6 +553,15 @@ describe Oakdex::Pokemon do
     end
   end
 
+  describe '#for_game' do
+    it 'generates hash' do
+      expect(subject.for_game).to be_a(Hash)
+      expect(subject.for_game[:current_hp]).to eq(subject.current_hp)
+      expect(subject.for_game[:moves].first[:type_id]).to eq('Electric')
+      expect(subject.for_game[:type_ids]).to eq(['Electric'])
+    end
+  end
+
   describe '.from_json' do
     let(:json) do
       File.read(File.expand_path('./spec/fixtures/pikachu.json'))

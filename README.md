@@ -44,6 +44,32 @@ bulbasaur = Oakdex::Pokemon.create('Bulbasaur', { # many options available
   primary_status_condition: 'sleep'
 })
 
+pikachu.for_game
+# {:name=>"Pikachu",
+#  :primary_status_condition=>nil,
+# :type_ids=>["Electric"],
+# :gender=>"female",
+# :friendship=>70,
+# :moves=>
+#  [{:move_id=>"Thunder Shock", :pp=>30, :max_pp=>40, :type_id=>"Electric"}],
+# :current_hp=>12,
+# :fainted=>false,
+# :wild=>nil,
+# :original_trainer=>nil,
+# :item_id=>nil,
+# :traded=>false,
+# :exp=>100,
+# :level=>4,
+# :exp_next_level=>125,
+# :nature_id=>"Bashful",
+# :ability_id=>"Static",
+# :hp=>17,
+# :atk=>9,
+# :def=>7,
+# :sp_atk=>9,
+# :sp_def=>8,
+# :speed=>12}
+
 pikachu.gender # => female
 pikachu.name # => Pikachu
 pikachu.level # => 12

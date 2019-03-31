@@ -279,6 +279,28 @@ module Oakdex
       end
     end
 
+    def for_game
+      {
+        name: name,
+        primary_status_condition: primary_status_condition,
+        type_ids: types,
+        gender: gender,
+        friendship: friendship,
+        moves: moves.map { |m| m.to_h.merge({ type_id: m.type.name }) },
+        current_hp: current_hp,
+        fainted: fainted?,
+        wild: wild?,
+        original_trainer: original_trainer,
+        item_id: item_id,
+        traded: traded?,
+        exp: exp,
+        level: level,
+        exp_next_level: exp_next_level,
+        nature_id: @attributes[:nature_id],
+        ability_id: @attributes[:ability_id]
+      }.merge(BATTLE_STATS.map { |s| [s, public_send(s)] }.to_h)
+    end
+
     private
 
     def growth_events
