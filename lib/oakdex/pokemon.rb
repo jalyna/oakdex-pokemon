@@ -282,6 +282,7 @@ module Oakdex
     def for_game
       {
         name: name,
+        species_id: species.name,
         primary_status_condition: primary_status_condition,
         type_ids: types,
         gender: gender,
